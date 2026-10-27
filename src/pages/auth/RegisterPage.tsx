@@ -67,7 +67,7 @@ export default function RegisterPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(ellipse at 40% 0%, rgba(6,182,212,0.12) 0%, transparent 60%), var(--color-surface-900)',
+      background: 'radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 60%), #f8fafc',
       padding: '24px 16px',
     }}>
       <div style={{ width: '100%', maxWidth: 440 }}>
@@ -75,11 +75,11 @@ export default function RegisterPage() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 16, margin: '0 auto 16px',
-            background: 'linear-gradient(135deg,#06b6d4,#7c3aed)',
+            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 26, boxShadow: '0 8px 32px rgba(6,182,212,0.35)',
+            fontSize: 26, color: '#ffffff', boxShadow: '0 8px 24px rgba(37,99,235,0.25)',
           }}>🎟️</div>
-          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 800, color: '#e2e8f0', marginBottom: 6 }}>
+          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
             Create an account
           </h1>
           <p style={{ fontSize: 14, color: '#64748b' }}>Join EventHub and start discovering events</p>
@@ -89,9 +89,9 @@ export default function RegisterPage() {
         <div className="glass-card" style={{ padding: 32 }}>
           {apiError && (
             <div style={{
-              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)',
+              background: '#fef2f2', border: '1px solid #fecaca',
               borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-              fontSize: 13, color: '#f87171',
+              fontSize: 13, color: '#b91c1c',
             }}>
               ⚠️ {apiError}
             </div>
@@ -112,7 +112,7 @@ export default function RegisterPage() {
           <div className="divider" />
           <p style={{ textAlign: 'center', fontSize: 13, color: '#64748b' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#a78bfa', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+            <Link to="/login" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
           </p>
         </div>
       </div>
