@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 import { eventService } from '../services/eventService';
 import { bookingService } from '../services/bookingService';
 import CustomerLayout from '../layouts/CustomerLayout';
@@ -188,7 +189,7 @@ export default function BookingPage() {
 
                 {mutation.isError && (
                   <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#f87171' }}>
-                    ⚠️ {(mutation.error as any)?.response?.data?.message ?? 'Booking failed. Please try again.'}
+                    ⚠️ {(axios.isAxiosError(mutation.error) && (mutation.error.response?.data as { message?: string })?.message) || 'Booking failed. Please try again.'}
                   </div>
                 )}
 

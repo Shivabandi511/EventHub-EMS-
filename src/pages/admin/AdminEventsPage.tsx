@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { eventService, categoryService, venueService, type Event } from '../../services/eventService';
+import axios from 'axios';
+import { eventService, categoryService, venueService, type Event, type Category, type Venue } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
 interface EventForm {
@@ -201,7 +202,7 @@ export default function AdminEventsPage() {
                   <select id="ev-cat" className={`input${errors.categoryId ? ' error' : ''}`}
                     value={form.categoryId} onChange={e => setForm(p => ({ ...p, categoryId: e.target.value }))}>
                     <option value="">Select category</option>
-                    {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {categories.map((c: Category) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                   {errors.categoryId && <p className="error-text">{errors.categoryId}</p>}
                 </div>
@@ -210,7 +211,7 @@ export default function AdminEventsPage() {
                   <select id="ev-venue" className={`input${errors.venueId ? ' error' : ''}`}
                     value={form.venueId} onChange={e => setForm(p => ({ ...p, venueId: e.target.value }))}>
                     <option value="">Select venue</option>
-                    {venueList.map((v: any) => <option key={v.id} value={v.id}>{v.name}, {v.city}</option>)}
+                    {venueList.map((v: Venue) => <option key={v.id} value={v.id}>{v.name}, {v.city}</option>)}
                   </select>
                   {errors.venueId && <p className="error-text">{errors.venueId}</p>}
                 </div>
@@ -248,7 +249,7 @@ export default function AdminEventsPage() {
 
               {saveMutation.isError && (
                 <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#f87171' }}>
-                  ⚠️ {(saveMutation.error as any)?.response?.data?.message ?? 'Failed to save. Try again.'}
+                  ⚠️ {(axios.isAxiosError(saveMutation.error) && (saveMutation.error.response?.data as { message?: string })?.message) || 'Failed to save. Try again.'}
                 </div>
               )}
 

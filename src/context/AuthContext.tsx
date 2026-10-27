@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
 export interface User {
   id: number;
@@ -21,23 +21,24 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem('eh_token');
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('eh_token'));
+  const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('eh_user');
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser) as User;
+      } catch {
+        return null;
+      }
     }
-  }, []);
+    return null;
+  });
 
-  const login = (token: string, user: User) => {
-    localStorage.setItem('eh_token', token);
-    localStorage.setItem('eh_user', JSON.stringify(user));
-    setToken(token);
-    setUser(user);
+  const login = (newToken: string, newUser: User) => {
+    localStorage.setItem('eh_token', newToken);
+    localStorage.setItem('eh_user', JSON.stringify(newUser));
+    setToken(newToken);
+    setUser(newUser);
   };
 
   const logout = () => {
@@ -67,6 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used inside AuthProvider');

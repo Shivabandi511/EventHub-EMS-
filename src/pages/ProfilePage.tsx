@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileService } from '../services/bookingService';
 import CustomerLayout from '../layouts/CustomerLayout';
 import { useAuth } from '../context/AuthContext';

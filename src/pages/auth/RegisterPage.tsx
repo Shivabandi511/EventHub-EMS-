@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
 
@@ -37,8 +38,12 @@ export default function RegisterPage() {
       });
       login(res.data.token, res.data.user);
       navigate('/');
-    } catch (err: any) {
-      setApiError(err.response?.data?.message ?? 'Registration failed. Please try again.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setApiError((err.response?.data as { message?: string })?.message ?? 'Registration failed. Please try again.');
+      } else {
+        setApiError('Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

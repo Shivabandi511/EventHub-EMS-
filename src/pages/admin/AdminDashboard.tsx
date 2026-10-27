@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { eventService } from '../../services/eventService';
-import { bookingService } from '../../services/bookingService';
+import { eventService, type Event } from '../../services/eventService';
+import { bookingService, type Booking } from '../../services/bookingService';
 import AdminLayout from '../../layouts/AdminLayout';
 
 const StatCard = ({ icon, label, value, color }: { icon: string; label: string; value: string | number; color: string }) => (
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 20, marginBottom: 40 }}>
           <StatCard icon="🎭" label="Total Events"   value={totalEvents}   color="rgba(124,58,237,0.2)" />
           <StatCard icon="🎟️" label="Total Bookings" value={totalBookings} color="rgba(6,182,212,0.2)" />
-          <StatCard icon="👥" label="Active Events"   value={events.filter((e: any) => e.status === 'ACTIVE').length}  color="rgba(34,197,94,0.2)" />
+          <StatCard icon="👥" label="Active Events"   value={events.filter((e: Event) => e.status === 'ACTIVE').length}  color="rgba(34,197,94,0.2)" />
           <StatCard icon="💰" label="Revenue Today"   value="₹—"           color="rgba(234,179,8,0.2)" />
         </div>
 
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
               <p style={{ color: '#64748b', fontSize: 14, textAlign: 'center', padding: '24px 0' }}>No events yet</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {events.map((ev: any) => (
+                {events.map((ev: Event) => (
                   <div key={ev.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     <div>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{ev.title}</p>
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
               <p style={{ color: '#64748b', fontSize: 14, textAlign: 'center', padding: '24px 0' }}>No bookings yet</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {bookings.map((bk: any) => (
+                {bookings.map((bk: Booking) => (
                   <div key={bk.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     <div>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{bk.event?.title ?? 'Event'}</p>

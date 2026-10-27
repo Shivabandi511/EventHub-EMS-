@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { eventService, categoryService, type Event } from '../services/eventService';
+import { eventService, categoryService, type Event, type Category } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
 
 const CATEGORIES_EMOJI: Record<string, string> = {
@@ -58,7 +58,7 @@ function EventCard({ event }: { event: Event }) {
 }
 
 export default function EventListingPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState({
     search:     searchParams.get('search')     ?? '',
     categoryId: searchParams.get('categoryId') ?? '',
@@ -157,7 +157,7 @@ export default function EventListingPage() {
                     style={{ fontSize: 13 }}
                   >
                     <option value="">All Categories</option>
-                    {categories.map((c: any) => (
+                    {categories.map((c: Category) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
