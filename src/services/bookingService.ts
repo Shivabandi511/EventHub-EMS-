@@ -1,4 +1,6 @@
 import api from './api';
+import type { PagedResponse } from './eventService';
+import type { User } from '../context/AuthContext';
 
 export interface BookingRequest {
   eventId: number;
@@ -27,6 +29,7 @@ export interface Booking {
   totalAmount: number;
   status: 'CONFIRMED' | 'CANCELLED' | 'PENDING';
   attendees?: AttendeeInfo[];
+  user?: { id?: number; name?: string; email?: string };
 }
 
 export const bookingService = {
@@ -35,12 +38,12 @@ export const bookingService = {
   getBooking:    (id: number)            => api.get<Booking>(`/bookings/${id}`),
   // Admin
   getAllBookings: (params?: { page?: number; size?: number }) =>
-                                            api.get<any>('/admin/bookings', { params }),
+    api.get<PagedResponse<Booking>>('/admin/bookings', { params }),
   updateStatus:  (id: number, status: string) =>
                                             api.patch(`/admin/bookings/${id}/status`, { status }),
 };
 
 export const profileService = {
-  getMe:    ()               => api.get('/users/me'),
-  updateMe: (data: unknown)  => api.put('/users/me', data),
+  getMe:    ()               => api.get<User>('/users/me'),
+  updateMe: (data: unknown)  => api.put<User>('/users/me', data),
 };

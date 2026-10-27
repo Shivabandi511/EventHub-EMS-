@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { bookingService } from '../../services/bookingService';
+import { bookingService, type Booking } from '../../services/bookingService';
 import AdminLayout from '../../layouts/AdminLayout';
 
 const STATUS_OPTIONS = ['CONFIRMED', 'CANCELLED', 'PENDING'];
@@ -70,7 +70,7 @@ export default function AdminBookingsPage() {
                 </tr>
               </thead>
               <tbody>
-                {bookings.map((bk: any) => (
+                {bookings.map((bk: Booking) => (
                   <tr key={bk.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>

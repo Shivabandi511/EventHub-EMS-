@@ -35,14 +35,26 @@ export interface PagedResponse<T> {
   size: number;
 }
 
+export interface EventPayload {
+  title?: string;
+  description?: string;
+  category?: { id: number; name?: string };
+  venue?: { id: number; name?: string; city?: string; address?: string; capacity?: number };
+  dateTime?: string;
+  price?: number;
+  totalSeats?: number;
+  status?: 'ACTIVE' | 'CANCELLED' | 'COMPLETED' | string;
+  imageUrl?: string;
+}
+
 export interface Category { id: number; name: string; description?: string; status?: string; }
 export interface Venue    { id: number; name: string; address: string; city: string; capacity: number; }
 
 export const eventService = {
   getEvents:   (params?: EventFilters) => api.get<PagedResponse<Event>>('/events', { params }),
   getEvent:    (id: number)             => api.get<Event>(`/events/${id}`),
-  createEvent: (data: Partial<Event>)   => api.post<Event>('/events', data),
-  updateEvent: (id: number, data: Partial<Event>) => api.put<Event>(`/events/${id}`, data),
+  createEvent: (data: EventPayload)     => api.post<Event>('/events', data),
+  updateEvent: (id: number, data: EventPayload) => api.put<Event>(`/events/${id}`, data),
   deleteEvent: (id: number)             => api.delete(`/events/${id}`),
 };
 

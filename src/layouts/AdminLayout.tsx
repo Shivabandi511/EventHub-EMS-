@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useState } from 'react';
+import type { ReactNode } from 'react';
 
 const sidebarLinks = [
   { to: '/admin',           icon: '📊', label: 'Dashboard' },
@@ -10,11 +10,10 @@ const sidebarLinks = [
   { to: '/admin/bookings',  icon: '🎟️', label: 'Bookings' },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate  = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 

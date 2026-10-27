@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { eventService, categoryService, type Event } from '../services/eventService';
+import { eventService, categoryService, type Event, type Category } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
 import { useState } from 'react';
 
@@ -176,7 +176,7 @@ export default function HomePage() {
               Browse by Category
             </h2>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {categories.map((cat: any) => (
+              {categories.map((cat: Category) => (
                 <button
                   key={cat.id}
                   className="btn btn-secondary"

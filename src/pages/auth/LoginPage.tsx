@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
 
@@ -31,8 +32,12 @@ export default function LoginPage() {
       const res = await authService.login(form);
       login(res.data.token, res.data.user);
       navigate(res.data.user.role === 'ADMIN' ? '/admin' : '/');
-    } catch (err: any) {
-      setApiError(err.response?.data?.message ?? 'Invalid credentials. Please try again.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setApiError((err.response?.data as { message?: string })?.message ?? 'Invalid credentials. Please try again.');
+      } else {
+        setApiError('Invalid credentials. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
