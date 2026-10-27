@@ -1,5 +1,10 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
+// ========================================================
+// 1. DATA TYPES
+// ========================================================
+
+/** Details of the currently logged-in user */
 export interface User {
   id: number;
   name: string;
@@ -8,6 +13,7 @@ export interface User {
   role: 'CUSTOMER' | 'ADMIN';
 }
 
+/** Everything the AuthContext provides to the rest of the application */
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -18,22 +24,48 @@ interface AuthContextType {
   updateUser: (user: User) => void;
 }
 
+// ========================================================
+// 2. HELPER FUNCTIONS FOR LOCAL STORAGE
+// ========================================================
+
+// Read the saved JWT token from localStorage (if any)
+function getInitialToken(): string | null {
+  return localStorage.getItem('eh_token');
+}
+
+// Read and parse the saved user details from localStorage (if any)
+function getInitialUser(): User | null {
+  const savedData = localStorage.getItem('eh_user');
+  if (!savedData) {
+    return null;
+  }
+  try {
+    return JSON.parse(savedData) as User;
+  } catch {
+    return null;
+  }
+}
+
+// ========================================================
+// 3. CREATE CONTEXT
+// ========================================================
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('eh_token'));
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem('eh_user');
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser) as User;
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  });
+// ========================================================
+// 4. AUTH PROVIDER COMPONENT
+// ========================================================
 
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  // Store authentication state
+  const [token, setToken] = useState<string | null>(getInitialToken);
+  const [user, setUser] = useState<User | null>(getInitialUser);
+
+  // Helper booleans
+  const isAuthenticated = Boolean(token && user);
+  const isAdmin = user?.role === 'ADMIN';
+
+  // Function called when the user successfully signs in
   const login = (newToken: string, newUser: User) => {
     localStorage.setItem('eh_token', newToken);
     localStorage.setItem('eh_user', JSON.stringify(newUser));
@@ -41,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(newUser);
   };
 
+  // Function called when the user logs out
   const logout = () => {
     localStorage.removeItem('eh_token');
     localStorage.removeItem('eh_user');
@@ -48,29 +81,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
+  // Function called when profile details are updated
   const updateUser = (updatedUser: User) => {
     localStorage.setItem('eh_user', JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      token,
-      isAuthenticated: !!token && !!user,
-      isAdmin: user?.role === 'ADMIN',
-      login,
-      logout,
-      updateUser,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated,
+        isAdmin,
+        login,
+        logout,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+// ========================================================
+// 5. CUSTOM HOOK
+// ========================================================
+
+/** Convenient hook for components to access authentication data */
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used inside an <AuthProvider>');
+  }
+  return context;
 };
