@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { 
+  HiTicket, 
+  HiUser, 
+  HiEnvelope, 
+  HiPhone, 
+  HiLockClosed, 
+  HiUserPlus, 
+  HiExclamationTriangle 
+} from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
 
@@ -51,10 +60,14 @@ export default function RegisterPage() {
 
   const field = (
     id: string, label: string, type: string,
-    placeholder: string, key: keyof typeof form
+    placeholder: string, key: keyof typeof form,
+    icon: React.ReactElement
   ) => (
     <div>
-      <label className="label" htmlFor={id}>{label}</label>
+      <label className="label" htmlFor={id}>
+        {icon}
+        <span>{label}</span>
+      </label>
       <input
         id={id} type={type} className={`input${errors[key] ? ' error' : ''}`}
         placeholder={placeholder} value={form[key]}
@@ -67,7 +80,7 @@ export default function RegisterPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 60%), #f8fafc',
+      background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 65%), #faf8ff',
       padding: '24px 16px',
     }}>
       <div style={{ width: '100%', maxWidth: 440 }}>
@@ -75,44 +88,54 @@ export default function RegisterPage() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 16, margin: '0 auto 16px',
-            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 26, color: '#ffffff', boxShadow: '0 8px 24px rgba(37,99,235,0.25)',
-          }}>🎟️</div>
-          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
+            fontSize: 28, color: '#ffffff', boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
+          }}>
+            <HiTicket />
+          </div>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e1b4b', marginBottom: 6 }}>
             Create an account
           </h1>
-          <p style={{ fontSize: 14, color: '#64748b' }}>Join EventHub and start discovering events</p>
+          <p style={{ fontSize: 14, color: '#6b7280' }}>Join EventHub and start exploring events</p>
         </div>
 
         {/* Card */}
         <div className="glass-card" style={{ padding: 32 }}>
           {apiError && (
             <div style={{
-              background: '#fef2f2', border: '1px solid #fecaca',
+              background: '#fff1f2', border: '1px solid #fecdd3',
               borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-              fontSize: 13, color: '#b91c1c',
+              fontSize: 13, color: '#be123c', display: 'flex', alignItems: 'center', gap: 8,
             }}>
-              ⚠️ {apiError}
+              <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
+              <span>{apiError}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {field('reg-name',    'Full Name',        'text',     'John Doe',          'name')}
-            {field('reg-email',   'Email Address',    'email',    'you@example.com',   'email')}
-            {field('reg-phone',   'Phone (optional)', 'tel',      '9876543210',        'phone')}
-            {field('reg-pass',    'Password',         'password', '••••••••',          'password')}
-            {field('reg-confirm', 'Confirm Password', 'password', '••••••••',          'confirmPassword')}
+            {field('reg-name', 'Full Name', 'text', 'John Doe', 'name', <HiUser style={{ fontSize: 14, color: '#7c3aed' }} />)}
+            {field('reg-email', 'Email Address', 'email', 'you@example.com', 'email', <HiEnvelope style={{ fontSize: 14, color: '#7c3aed' }} />)}
+            {field('reg-phone', 'Phone Number', 'tel', '9876543210 (optional)', 'phone', <HiPhone style={{ fontSize: 14, color: '#7c3aed' }} />)}
+            {field('reg-pass', 'Password', 'password', '•••••••• (min 6 chars)', 'password', <HiLockClosed style={{ fontSize: 14, color: '#7c3aed' }} />)}
+            {field('reg-cpass', 'Confirm Password', 'password', '••••••••', 'confirmPassword', <HiLockClosed style={{ fontSize: 14, color: '#7c3aed' }} />)}
 
-            <button id="btn-register" type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 4 }} disabled={loading}>
-              {loading ? <><span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} /> Creating account…</> : 'Create Account'}
+            <button id="btn-register" type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+              {loading ? (
+                <><span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} /> Creating account…</>
+              ) : (
+                <><HiUserPlus style={{ fontSize: 18 }} /> Create Account</>
+              )}
             </button>
           </form>
 
           <div className="divider" />
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#64748b' }}>
+
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+            <Link to="/login" style={{ color: '#7c3aed', fontWeight: 600, textDecoration: 'none' }}>
+              Sign in
+            </Link>
           </p>
         </div>
       </div>

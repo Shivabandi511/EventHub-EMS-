@@ -1,8 +1,20 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { 
+  HiCalendar, 
+  HiMapPin, 
+  HiTicket, 
+  HiArrowLeft, 
+  HiBuildingOffice2, 
+  HiUserGroup, 
+  HiBanknotes, 
+  HiExclamationTriangle,
+  HiNoSymbol
+} from 'react-icons/hi2';
 import { eventService } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
 import { useAuth } from '../context/AuthContext';
+import { getEventImage } from '../assets/images';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,11 +39,16 @@ export default function EventDetailPage() {
 
   if (isError || !event) return (
     <CustomerLayout>
-      <div style={{ textAlign: 'center', padding: '80px 24px' }}>
-        <div style={{ fontSize: 64, marginBottom: 20 }}>😕</div>
-        <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, color: '#e2e8f0', marginBottom: 12 }}>Event Not Found</h2>
-        <p style={{ color: '#64748b', marginBottom: 24 }}>This event may have been removed or doesn't exist.</p>
-        <Link to="/events" className="btn btn-primary">← Browse Events</Link>
+      <div className="state-box" style={{ maxWidth: 500, margin: '80px auto' }}>
+        <div style={{ fontSize: 52, color: '#e11d48', marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
+          <HiExclamationTriangle />
+        </div>
+        <h2 style={{ fontSize: 26, fontWeight: 800, color: '#1e1b4b', marginBottom: 10 }}>Event Not Found</h2>
+        <p style={{ color: '#6b7280', marginBottom: 24 }}>This event may have been removed or does not exist.</p>
+        <Link to="/events" className="btn btn-primary btn-md">
+          <HiArrowLeft />
+          <span>Browse Events</span>
+        </Link>
       </div>
     </CustomerLayout>
   );
@@ -39,68 +56,69 @@ export default function EventDetailPage() {
   const date       = new Date(event.dateTime);
   const isSoldOut  = event.availableSeats === 0;
   const isCancelled = event.status === 'CANCELLED';
+  const eventImg   = getEventImage(event.imageUrl, event.category?.name);
 
   return (
     <CustomerLayout>
-      <div className="container-app" style={{ padding: '40px 24px' }}>
+      <div className="container-app page-container">
         {/* Breadcrumb */}
-        <nav style={{ marginBottom: 28, fontSize: 13, color: '#64748b' }}>
-          <Link to="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</Link>
-          {' / '}
-          <Link to="/events" style={{ color: '#64748b', textDecoration: 'none' }}>Events</Link>
-          {' / '}
-          <span style={{ color: '#2563eb', fontWeight: 600 }}>{event.title}</span>
+        <nav style={{ marginBottom: 24, fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Link to="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Home</Link>
+          <span>/</span>
+          <Link to="/events" style={{ color: '#6b7280', textDecoration: 'none' }}>Events</Link>
+          <span>/</span>
+          <span style={{ color: '#7c3aed', fontWeight: 600 }}>{event.title}</span>
         </nav>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 32, alignItems: 'start' }}>
           {/* ── Left: Details ── */}
           <div>
-            {/* Event Image / Placeholder */}
+            {/* Event Image */}
             <div style={{
-              height: 340, borderRadius: 20, overflow: 'hidden',
-              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 32, position: 'relative',
-              border: '1px solid #e2e8f0',
+              height: 360, borderRadius: 20, overflow: 'hidden',
+              background: '#f5f3ff',
+              position: 'relative', marginBottom: 28,
+              border: '1px solid #ede9fe',
             }}>
-              {event.imageUrl
-                ? <img src={event.imageUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontSize: 80 }}>🎭</span>}
+              <img src={eventImg} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 8 }}>
                 <span className="badge badge-purple">{event.category?.name}</span>
-                {isCancelled && <span className="badge badge-red">Cancelled</span>}
-                {isSoldOut   && !isCancelled && <span className="badge badge-red">Sold Out</span>}
+                {isCancelled && <span className="badge badge-rose">Cancelled</span>}
+                {isSoldOut   && !isCancelled && <span className="badge badge-rose">Sold Out</span>}
               </div>
             </div>
 
             {/* Title */}
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 800, color: '#0f172a', marginBottom: 20, lineHeight: 1.2 }}>
+            <h1 style={{ fontSize: 34, fontWeight: 800, color: '#1e1b4b', marginBottom: 20, lineHeight: 1.2 }}>
               {event.title}
             </h1>
 
             {/* Info Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 32 }}>
               {[
-                { icon: '📅', label: 'Date & Time', value: `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} at ${date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` },
-                { icon: '📍', label: 'Venue', value: `${event.venue?.name}, ${event.venue?.city}` },
-                { icon: '📬', label: 'Address', value: event.venue?.address },
-                { icon: '🏟️', label: 'Capacity', value: `${event.venue?.capacity?.toLocaleString('en-IN')} seats` },
-                { icon: '🎟️', label: 'Available Seats', value: isSoldOut ? 'Sold Out' : `${event.availableSeats} / ${event.totalSeats}` },
-                { icon: '💰', label: 'Ticket Price', value: event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}` },
+                { icon: <HiCalendar style={{ color: '#7c3aed', fontSize: 20 }} />, label: 'Date & Time', value: `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} at ${date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` },
+                { icon: <HiMapPin style={{ color: '#e11d48', fontSize: 20 }} />, label: 'Venue', value: `${event.venue?.name}, ${event.venue?.city}` },
+                { icon: <HiBuildingOffice2 style={{ color: '#059669', fontSize: 20 }} />, label: 'Address', value: event.venue?.address },
+                { icon: <HiUserGroup style={{ color: '#d97706', fontSize: 20 }} />, label: 'Capacity', value: `${event.venue?.capacity?.toLocaleString('en-IN')} seats` },
+                { icon: <HiTicket style={{ color: '#7c3aed', fontSize: 20 }} />, label: 'Available Seats', value: isSoldOut ? 'Sold Out' : `${event.availableSeats} / ${event.totalSeats}` },
+                { icon: <HiBanknotes style={{ color: '#059669', fontSize: 20 }} />, label: 'Ticket Price', value: event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}` },
               ].map(({ icon, label, value }) => (
-                <div key={label} className="glass-card" style={{ padding: '14px 18px' }}>
-                  <p style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{icon} {label}</p>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>{value}</p>
+                <div key={label} className="glass-card" style={{ padding: '16px 18px' }}>
+                  <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {icon}
+                    <span>{label}</span>
+                  </p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#1e1b4b' }}>{value}</p>
                 </div>
               ))}
             </div>
 
             {/* Description */}
-            <div>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
+            <div className="glass-card" style={{ padding: 24 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e1b4b', marginBottom: 12 }}>
                 About This Event
               </h2>
-              <p style={{ fontSize: 15, color: '#334155', lineHeight: 1.8 }}>
+              <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>
                 {event.description ?? 'No description provided.'}
               </p>
             </div>
@@ -108,28 +126,28 @@ export default function EventDetailPage() {
 
           {/* ── Right: Booking Card ── */}
           <div style={{ position: 'sticky', top: 90 }}>
-            <div className="glass-card" style={{ padding: 28, boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.08)' }}>
-              <div style={{ marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid #e2e8f0' }}>
-                <p style={{ fontSize: 13, color: '#64748b', marginBottom: 6 }}>Price per ticket</p>
-                <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 900, color: '#2563eb' }}>
+            <div className="glass-card" style={{ padding: 28, boxShadow: '0 8px 30px rgba(124, 58, 237, 0.08)' }}>
+              <div style={{ marginBottom: 20, paddingBottom: 18, borderBottom: '1px solid #ede9fe' }}>
+                <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 6 }}>Price per ticket</p>
+                <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 900, color: '#059669' }}>
                   {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
                 </p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                  <span style={{ color: '#64748b' }}>Status</span>
-                  <span className={`badge ${isCancelled ? 'badge-red' : isSoldOut ? 'badge-red' : 'badge-green'}`}>
+                  <span style={{ color: '#6b7280' }}>Status</span>
+                  <span className={`badge ${isCancelled ? 'badge-rose' : isSoldOut ? 'badge-rose' : 'badge-green'}`}>
                     {isCancelled ? 'Cancelled' : isSoldOut ? 'Sold Out' : 'Available'}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                  <span style={{ color: '#64748b' }}>Seats Left</span>
-                  <span style={{ color: '#0f172a', fontWeight: 600 }}>{event.availableSeats}</span>
+                  <span style={{ color: '#6b7280' }}>Seats Left</span>
+                  <span style={{ color: '#1e1b4b', fontWeight: 700 }}>{event.availableSeats}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                  <span style={{ color: '#64748b' }}>Venue Capacity</span>
-                  <span style={{ color: '#0f172a', fontWeight: 600 }}>{event.venue?.capacity?.toLocaleString('en-IN')}</span>
+                  <span style={{ color: '#6b7280' }}>Venue Capacity</span>
+                  <span style={{ color: '#1e1b4b', fontWeight: 700 }}>{event.venue?.capacity?.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 
@@ -141,24 +159,28 @@ export default function EventDetailPage() {
                     style={{ width: '100%' }}
                     onClick={() => navigate(`/booking/${event.id}`)}
                   >
-                    🎟️ Book Tickets
+                    <HiTicket style={{ fontSize: 20 }} />
+                    <span>Book Tickets</span>
                   </button>
                 ) : (
                   <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>Sign in to book tickets</p>
-                    <Link to="/login" className="btn btn-primary btn-lg" style={{ width: '100%', display: 'block' }}>
-                      Login to Book
+                    <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>Sign in to reserve your tickets</p>
+                    <Link to="/login" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
+                      <HiTicket style={{ fontSize: 18 }} />
+                      <span>Login to Book</span>
                     </Link>
                   </div>
                 )
               ) : (
                 <button className="btn btn-secondary btn-lg" style={{ width: '100%' }} disabled>
-                  {isCancelled ? '❌ Event Cancelled' : '🚫 Sold Out'}
+                  <HiNoSymbol style={{ fontSize: 18 }} />
+                  <span>{isCancelled ? 'Event Cancelled' : 'Sold Out'}</span>
                 </button>
               )}
 
-              <Link to="/events" style={{ display: 'block', textAlign: 'center', marginTop: 16, fontSize: 13, color: '#64748b', textDecoration: 'none' }}>
-                ← Back to Events
+              <Link to="/events" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 18, fontSize: 13, color: '#6b7280', textDecoration: 'none' }}>
+                <HiArrowLeft />
+                <span>Back to Events</span>
               </Link>
             </div>
           </div>

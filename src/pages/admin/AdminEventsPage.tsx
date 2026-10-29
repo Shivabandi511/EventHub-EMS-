@@ -1,6 +1,20 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { 
+  HiCalendarDays, 
+  HiPlus, 
+  HiPencilSquare, 
+  HiTrash, 
+  HiChevronLeft, 
+  HiChevronRight, 
+  HiMapPin, 
+  HiTicket, 
+  HiXMark,
+  HiExclamationTriangle,
+  HiMagnifyingGlass,
+  HiFunnel
+} from 'react-icons/hi2';
 import { eventService, categoryService, venueService, type Event, type Category, type Venue } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
@@ -21,20 +35,37 @@ export default function AdminEventsPage() {
   const [form, setForm] = useState<EventForm>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [page, setPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCatId, setSelectedCatId] = useState<string>('ALL');
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-events', page],
-    queryFn: () => eventService.getEvents({ page, size: 10 }),
+    queryKey: ['admin-events'],
+    queryFn: () => eventService.getEvents({ size: 100 }),
     retry: false,
   });
   const { data: cats } = useQuery({ queryKey: ['categories'], queryFn: () => categoryService.getAll(), retry: false });
   const { data: venues } = useQuery({ queryKey: ['venues'], queryFn: () => venueService.getAll(), retry: false });
 
-  const events     = data?.data?.content    ?? [];
-  const totalPages = data?.data?.totalPages ?? 0;
-  const categories = cats?.data    ?? [];
-  const venueList  = venues?.data  ?? [];
+  const rawEvents  = data?.data?.content ?? [];
+  const categories = cats?.data          ?? [];
+  const venueList  = venues?.data        ?? [];
+
+  const filteredEvents = useMemo(() => {
+    return rawEvents.filter((ev: Event) => {
+      const matchesCat = selectedCatId === 'ALL' || String(ev.category?.id) === selectedCatId;
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = !q ||
+        ev.title.toLowerCase().includes(q) ||
+        (ev.venue?.city ?? '').toLowerCase().includes(q) ||
+        (ev.venue?.name ?? '').toLowerCase().includes(q);
+      return matchesCat && matchesSearch;
+    });
+  }, [rawEvents, selectedCatId, searchQuery]);
+
+  const pageSize = 8;
+  const totalPages = Math.ceil(filteredEvents.length / pageSize) || 1;
+  const pagedEvents = filteredEvents.slice(page * pageSize, (page + 1) * pageSize);
 
   const openCreate = () => { setEditEvent(null); setForm(EMPTY_FORM); setErrors({}); setShowModal(true); };
   const openEdit   = (ev: Event) => {
@@ -51,12 +82,12 @@ export default function AdminEventsPage() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.title.trim())        e.title       = 'Title is required';
-    if (!form.categoryId)          e.categoryId  = 'Category is required';
-    if (!form.venueId)             e.venueId     = 'Venue is required';
-    if (!form.dateTime)            e.dateTime    = 'Date & time is required';
-    if (Number(form.price) < 0)    e.price       = 'Price cannot be negative';
-    if (Number(form.totalSeats) < 1) e.totalSeats = 'At least 1 seat required';
+    if (!form.title.trim())          e.title       = 'Title is required';
+    if (!form.categoryId)            e.categoryId  = 'Category is required';
+    if (!form.venueId)               e.venueId     = 'Venue is required';
+    if (!form.dateTime)              e.dateTime    = 'Date & time is required';
+    if (Number(form.price) < 0)      e.price       = 'Price cannot be negative';
+    if (Number(form.totalSeats) < 1) e.totalSeats  = 'At least 1 seat required';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -85,6 +116,7 @@ export default function AdminEventsPage() {
     mutationFn: (id: number) => eventService.deleteEvent(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-events'] });
+      qc.invalidateQueries({ queryKey: ['events'] });
       setDeleteConfirm(null);
     },
   });
@@ -96,108 +128,186 @@ export default function AdminEventsPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: 1100 }}>
+      <div className="page-container" style={{ maxWidth: 1100, padding: 0 }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a' }}>Event Management</h1>
-            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>{data?.data?.totalElements ?? 0} total events</p>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiCalendarDays style={{ color: '#7c3aed' }} />
+              <span>Event Management</span>
+            </h1>
+            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
+              {rawEvents.length} total events organized in platform
+            </p>
           </div>
-          <button id="btn-create-event" className="btn btn-primary" onClick={openCreate}>➕ Create Event</button>
+          <button id="btn-create-event" className="btn btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <HiPlus />
+            <span>Create Event</span>
+          </button>
+        </div>
+
+        {/* Filter Card */}
+        <div className="filter-card" style={{ marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: 260 }}>
+              <HiMagnifyingGlass style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 18 }} />
+              <input
+                type="text"
+                className="input"
+                style={{ paddingLeft: 42 }}
+                placeholder="Search event title, venue or city..."
+                value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setPage(0); }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <HiFunnel style={{ fontSize: 14 }} /> Category:
+            </span>
+            <button
+              className={`filter-chip ${selectedCatId === 'ALL' ? 'active' : ''}`}
+              onClick={() => { setSelectedCatId('ALL'); setPage(0); }}
+            >
+              All Categories
+            </button>
+            {categories.map((c: Category) => (
+              <button
+                key={c.id}
+                className={`filter-chip ${selectedCatId === String(c.id) ? 'active' : ''}`}
+                onClick={() => { setSelectedCatId(String(c.id)); setPage(0); }}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Table */}
-        <div className="glass-card" style={{ overflow: 'hidden' }}>
+        <div className="table-container">
           {isLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
               <div className="spinner" style={{ width: 40, height: 40 }} />
             </div>
-          ) : events.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 60 }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🎭</div>
-              <p style={{ color: '#64748b' }}>No events yet. Create your first event!</p>
+          ) : filteredEvents.length === 0 ? (
+            <div className="state-box">
+              <div style={{ fontSize: 48, color: '#94a3b8', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+                <HiTicket />
+              </div>
+              <p style={{ color: '#64748b', fontWeight: 500 }}>No events found matching your criteria.</p>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                  {['Event', 'Category', 'Date', 'Price', 'Seats', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 18px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((ev: Event) => (
-                  <tr key={ev.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                    <td style={{ padding: '14px 18px' }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{ev.title}</p>
-                      <p style={{ fontSize: 12, color: '#64748b' }}>📍 {ev.venue?.city}</p>
-                    </td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{ev.category?.name}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{new Date(ev.dateTime).toLocaleDateString('en-IN')}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: '#2563eb' }}>{ev.price === 0 ? 'Free' : `₹${ev.price}`}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{ev.availableSeats}/{ev.totalSeats}</td>
-                    <td style={{ padding: '14px 18px' }}>
-                      <span className={`badge ${ev.status === 'ACTIVE' ? 'badge-green' : ev.status === 'CANCELLED' ? 'badge-red' : 'badge-yellow'}`}>{ev.status}</span>
-                    </td>
-                    <td style={{ padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(ev)}>✏️ Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => setDeleteConfirm(ev.id)}>🗑️</button>
-                      </div>
-                    </td>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {['Event Name', 'Category', 'Date & Time', 'Price', 'Capacity / Seats', 'Status', 'Actions'].map(h => (
+                      <th key={h}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {pagedEvents.map((ev: Event) => (
+                    <tr key={ev.id}>
+                      <td>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>{ev.title}</p>
+                        <p style={{ fontSize: 12, color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <HiMapPin style={{ color: '#e11d48' }} />
+                          <span>{ev.venue?.name}, {ev.venue?.city}</span>
+                        </p>
+                      </td>
+                      <td>
+                        <span className="badge badge-purple">{ev.category?.name}</span>
+                      </td>
+                      <td style={{ fontSize: 13, color: '#475569' }}>
+                        {new Date(ev.dateTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>
+                        {ev.price === 0 ? 'Free' : `₹${ev.price?.toLocaleString('en-IN')}`}
+                      </td>
+                      <td style={{ fontSize: 13, color: '#475569' }}>
+                        <span style={{ fontWeight: 700, color: ev.availableSeats > 0 ? '#059669' : '#e11d48' }}>
+                          {ev.availableSeats}
+                        </span> / {ev.totalSeats} seats
+                      </td>
+                      <td>
+                        <span className={`badge ${ev.status === 'ACTIVE' ? 'badge-green' : ev.status === 'CANCELLED' ? 'badge-red' : 'badge-yellow'}`}>
+                          {ev.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-secondary btn-sm" onClick={() => openEdit(ev)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <HiPencilSquare style={{ fontSize: 14 }} />
+                            <span>Edit</span>
+                          </button>
+                          <button className="btn btn-danger btn-sm" onClick={() => setDeleteConfirm(ev.id)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <HiTrash style={{ fontSize: 14 }} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
-            <button className="btn btn-secondary btn-sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>← Prev</button>
-            <span style={{ fontSize: 13, color: '#64748b', padding: '0 12px', lineHeight: '32px' }}>Page {page + 1} of {totalPages}</span>
-            <button className="btn btn-secondary btn-sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>Next →</button>
+          <div className="pagination-container">
+            <button
+              className="pagination-btn"
+              disabled={page === 0}
+              onClick={() => setPage(p => p - 1)}
+            >
+              <HiChevronLeft /> Prev
+            </button>
+            <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600, padding: '0 8px' }}>
+              Page {page + 1} of {totalPages}
+            </span>
+            <button
+              className="pagination-btn"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Next <HiChevronRight />
+            </button>
           </div>
         )}
       </div>
 
       {/* ── Create/Edit Modal ── */}
       {showModal && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 100,
-          background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-        }} onClick={e => e.target === e.currentTarget && setShowModal(false)}>
-          <div style={{
-            background: '#ffffff', border: '1px solid #e2e8f0',
-            borderRadius: 20, padding: 32, width: '100%', maxWidth: 600,
-            maxHeight: '90vh', overflowY: 'auto',
-            boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)',
-          }}>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 24 }}>
-              {editEvent ? '✏️ Edit Event' : '➕ Create Event'}
-            </h2>
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
+          <div className="modal-box" style={{ maxWidth: 620 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+                {editEvent ? <><HiPencilSquare style={{ color: '#7c3aed' }} /> Edit Event</> : <><HiPlus style={{ color: '#7c3aed' }} /> Create Event</>}
+              </h2>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
+                <HiXMark />
+              </button>
+            </div>
 
             <form onSubmit={handleSave} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
                 <label className="label" htmlFor="ev-title">Event Title *</label>
-                <input id="ev-title" className={`input${errors.title ? ' error' : ''}`} placeholder="e.g. Tech Summit 2026"
+                <input id="ev-title" className={`input${errors.title ? ' error' : ''}`} placeholder="e.g. Annual Tech Symposium"
                   value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
                 {errors.title && <p className="error-text">{errors.title}</p>}
               </div>
 
               <div>
                 <label className="label" htmlFor="ev-desc">Description</label>
-                <textarea id="ev-desc" className="input" placeholder="Describe the event…" rows={3}
+                <textarea id="ev-desc" className="input" placeholder="Describe the event, agenda, and speakers…" rows={3}
                   value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                   style={{ resize: 'vertical' }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
                 <div>
                   <label className="label" htmlFor="ev-cat">Category *</label>
                   <select id="ev-cat" className={`input${errors.categoryId ? ' error' : ''}`}
@@ -225,7 +335,7 @@ export default function AdminEventsPage() {
                 {errors.dateTime && <p className="error-text">{errors.dateTime}</p>}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 14 }}>
                 <div>
                   <label className="label" htmlFor="ev-price">Price (₹) *</label>
                   <input id="ev-price" type="number" min="0" className={`input${errors.price ? ' error' : ''}`}
@@ -249,12 +359,13 @@ export default function AdminEventsPage() {
               </div>
 
               {saveMutation.isError && (
-                <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#f87171' }}>
-                  ⚠️ {(axios.isAxiosError(saveMutation.error) && (saveMutation.error.response?.data as { message?: string })?.message) || 'Failed to save. Try again.'}
+                <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#e11d48', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
+                  <span>{(axios.isAxiosError(saveMutation.error) && (saveMutation.error.response?.data as { message?: string })?.message) || 'Failed to save. Try again.'}</span>
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button id="btn-save-event" type="submit" className="btn btn-primary" disabled={saveMutation.isPending}>
                   {saveMutation.isPending ? 'Saving…' : editEvent ? 'Save Changes' : 'Create Event'}
                 </button>
@@ -267,13 +378,11 @@ export default function AdminEventsPage() {
 
       {/* ── Delete Confirm Modal ── */}
       {deleteConfirm !== null && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 110,
-          background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-        }}>
-          <div style={{ background: '#ffffff', border: '1px solid #fecaca', borderRadius: 16, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🗑️</div>
+        <div className="modal-overlay">
+          <div className="modal-box" style={{ maxWidth: 380, textAlign: 'center' }}>
+            <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+              <HiTrash />
+            </div>
             <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Delete Event?</h3>
             <p style={{ fontSize: 14, color: '#64748b', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>

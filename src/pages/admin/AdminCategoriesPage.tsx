@@ -1,5 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  HiTag, 
+  HiPlus, 
+  HiPencilSquare, 
+  HiTrash, 
+  HiXMark 
+} from 'react-icons/hi2';
 import { categoryService, type Category } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
@@ -36,85 +43,105 @@ export default function AdminCategoriesPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: 780 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+      <div className="page-container" style={{ maxWidth: 840, padding: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a' }}>Categories</h1>
-            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>{categories.length} categories</p>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiTag style={{ color: '#7c3aed' }} />
+              <span>Event Categories</span>
+            </h1>
+            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>{categories.length} categories available</p>
           </div>
-          <button id="btn-create-category" className="btn btn-primary" onClick={openCreate}>➕ Add Category</button>
+          <button id="btn-create-category" className="btn btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <HiPlus />
+            <span>Add Category</span>
+          </button>
         </div>
 
-        <div className="glass-card" style={{ overflow: 'hidden' }}>
+        <div className="table-container">
           {isLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
               <div className="spinner" style={{ width: 40, height: 40 }} />
             </div>
           ) : categories.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 60 }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🏷️</div>
-              <p style={{ color: '#64748b' }}>No categories yet.</p>
+            <div className="state-box">
+              <div style={{ fontSize: 48, color: '#94a3b8', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+                <HiTag />
+              </div>
+              <p style={{ color: '#64748b' }}>No categories created yet.</p>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                  {['#', 'Name', 'Description', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 18px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((cat, idx) => (
-                  <tr key={cat.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#64748b' }}>{idx + 1}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{cat.name}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{cat.description ?? '—'}</td>
-                    <td style={{ padding: '14px 18px' }}>
-                      <span className={`badge ${cat.status === 'INACTIVE' ? 'badge-red' : 'badge-green'}`}>
-                        {cat.status ?? 'Active'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(cat)}>✏️ Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => setDeleteConfirm(cat.id)}>🗑️</button>
-                      </div>
-                    </td>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {['#', 'Category Name', 'Description', 'Status', 'Actions'].map(h => (
+                      <th key={h}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {categories.map((cat, idx) => (
+                    <tr key={cat.id}>
+                      <td style={{ color: '#64748b', fontWeight: 600 }}>{idx + 1}</td>
+                      <td style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{cat.name}</td>
+                      <td style={{ fontSize: 13, color: '#475569' }}>{cat.description ?? '—'}</td>
+                      <td>
+                        <span className={`badge ${cat.status === 'INACTIVE' ? 'badge-red' : 'badge-green'}`}>
+                          {cat.status ?? 'Active'}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-secondary btn-sm" onClick={() => openEdit(cat)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <HiPencilSquare style={{ fontSize: 14 }} />
+                            <span>Edit</span>
+                          </button>
+                          <button className="btn btn-danger btn-sm" onClick={() => setDeleteConfirm(cat.id)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <HiTrash style={{ fontSize: 14 }} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
 
       {/* Modal */}
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-          onClick={e => e.target === e.currentTarget && setShowModal(false)}>
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 20, padding: 32, width: '100%', maxWidth: 440, boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)' }}>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 24 }}>
-              {editItem ? '✏️ Edit Category' : '➕ Add Category'}
-            </h2>
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
+          <div className="modal-box" style={{ maxWidth: 460 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+                {editItem ? <><HiPencilSquare style={{ color: '#7c3aed' }} /> Edit Category</> : <><HiPlus style={{ color: '#7c3aed' }} /> Add Category</>}
+              </h2>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
+                <HiXMark />
+              </button>
+            </div>
+
             <form onSubmit={e => { e.preventDefault(); if (validate()) saveMutation.mutate(); }} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label className="label" htmlFor="cat-name">Name *</label>
-                <input id="cat-name" className={`input${errors.name ? ' error' : ''}`} placeholder="e.g. Music"
+                <label className="label" htmlFor="cat-name">Category Name *</label>
+                <input id="cat-name" className={`input${errors.name ? ' error' : ''}`} placeholder="e.g. Technology"
                   value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
                 {errors.name && <p className="error-text">{errors.name}</p>}
               </div>
+
               <div>
                 <label className="label" htmlFor="cat-desc">Description</label>
-                <textarea id="cat-desc" className="input" placeholder="Optional description…" rows={3}
+                <textarea id="cat-desc" className="input" placeholder="Brief description…" rows={3}
                   value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                   style={{ resize: 'vertical' }} />
               </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button id="btn-save-category" type="submit" className="btn btn-primary" disabled={saveMutation.isPending}>
-                  {saveMutation.isPending ? 'Saving…' : editItem ? 'Save Changes' : 'Add Category'}
+                  {saveMutation.isPending ? 'Saving…' : editItem ? 'Save Changes' : 'Create Category'}
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
               </div>
@@ -125,14 +152,16 @@ export default function AdminCategoriesPage() {
 
       {/* Delete confirm */}
       {deleteConfirm !== null && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 110, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: '#ffffff', border: '1px solid #fecaca', borderRadius: 16, padding: 32, maxWidth: 360, width: '100%', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)' }}>
-            <div style={{ fontSize: 44, marginBottom: 14 }}>🗑️</div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>Delete Category?</h3>
-            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Events using this category may be affected.</p>
+        <div className="modal-overlay">
+          <div className="modal-box" style={{ maxWidth: 360, textAlign: 'center' }}>
+            <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+              <HiTrash />
+            </div>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Delete Category?</h3>
+            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(deleteConfirm!)}>
-                {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+                {deleteMutation.isPending ? 'Deleting…' : 'Yes, Delete'}
               </button>
               <button className="btn btn-secondary" onClick={() => setDeleteConfirm(null)}>Cancel</button>
             </div>

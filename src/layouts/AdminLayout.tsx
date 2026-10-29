@@ -1,13 +1,29 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { ReactNode } from 'react';
+import { 
+  HiChartBar, 
+  HiCalendarDays, 
+  HiTag, 
+  HiMapPin, 
+  HiTicket, 
+  HiBolt, 
+  HiArrowRightOnRectangle, 
+  HiArrowTopRightOnSquare 
+} from 'react-icons/hi2';
 
-const sidebarLinks = [
-  { to: '/admin',           icon: '📊', label: 'Dashboard' },
-  { to: '/admin/events',    icon: '🎭', label: 'Events' },
-  { to: '/admin/categories',icon: '🏷️', label: 'Categories' },
-  { to: '/admin/venues',    icon: '📍', label: 'Venues' },
-  { to: '/admin/bookings',  icon: '🎟️', label: 'Bookings' },
+interface NavItem {
+  to: string;
+  icon: React.ReactElement;
+  label: string;
+}
+
+const sidebarLinks: NavItem[] = [
+  { to: '/admin',            icon: <HiChartBar style={{ fontSize: 18 }} />, label: 'Dashboard' },
+  { to: '/admin/events',     icon: <HiCalendarDays style={{ fontSize: 18 }} />, label: 'Events' },
+  { to: '/admin/categories', icon: <HiTag style={{ fontSize: 18 }} />, label: 'Categories' },
+  { to: '/admin/venues',     icon: <HiMapPin style={{ fontSize: 18 }} />, label: 'Venues' },
+  { to: '/admin/bookings',   icon: <HiTicket style={{ fontSize: 18 }} />, label: 'Bookings' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -21,55 +37,66 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     path === '/admin' ? location.pathname === '/admin' : location.pathname.startsWith(path);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: '#f8fafc' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', background: '#faf8ff' }}>
       {/* ── Sidebar ── */}
       <aside style={{
-        width: 240, flexShrink: 0,
+        width: 250, flexShrink: 0,
         background: '#ffffff',
-        borderRight: '1px solid #e2e8f0',
+        borderRight: '1px solid #ede9fe',
         display: 'flex', flexDirection: 'column',
         position: 'sticky', top: 0, height: '100vh',
         overflowY: 'auto',
       }}>
         {/* Logo */}
-        <div style={{ padding: '20px 18px 16px', borderBottom: '1px solid #e2e8f0' }}>
+        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid #ede9fe' }}>
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 34, height: 34, borderRadius: 9,
-              background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+              width: 36, height: 36, borderRadius: 10,
+              background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 16, color: '#ffffff',
-            }}>⚡</div>
-            <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 18, color: '#0f172a' }}>
+              fontSize: 18, color: '#ffffff',
+              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+            }}>
+              <HiBolt />
+            </div>
+            <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 19, color: '#1e1b4b' }}>
               Event<span className="gradient-text">Hub</span>
             </span>
           </Link>
           <div style={{
             marginTop: 10, padding: '4px 8px', borderRadius: 6,
-            background: '#eff6ff', border: '1px solid #bfdbfe', display: 'inline-block',
+            background: '#f3e8ff', border: '1px solid #e9d5ff', display: 'inline-block',
           }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#1d4ed8', letterSpacing: '0.5px' }}>ADMIN PANEL</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', letterSpacing: '0.5px' }}>ADMIN CONSOLE</span>
           </div>
         </div>
 
         {/* Nav links */}
         <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
           {sidebarLinks.map(({ to, icon, label }) => (
-            <Link key={to} to={to} className={`sidebar-link${isActive(to) ? ' active' : ''}`}>
-              <span style={{ fontSize: 16 }}>{icon}</span>
-              {label}
+            <Link key={to} to={to} className={`sidebar-link ${isActive(to) ? 'active' : ''}`}>
+              <span>{icon}</span>
+              <span>{label}</span>
             </Link>
           ))}
+
+          <div style={{ borderTop: '1px solid #ede9fe', margin: '14px 0 8px' }} />
+
+          <Link to="/" className="sidebar-link" style={{ color: '#6b7280' }}>
+            <HiArrowTopRightOnSquare style={{ fontSize: 18 }} />
+            <span>Customer View</span>
+          </Link>
         </nav>
 
         {/* User info + logout */}
-        <div style={{ padding: '16px 12px', borderTop: '1px solid #e2e8f0' }}>
-          <div style={{ padding: '10px 12px', borderRadius: 10, background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 10 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{user?.name}</p>
-            <p style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{user?.email}</p>
+        <div style={{ padding: '16px 14px', borderTop: '1px solid #ede9fe' }}>
+          <div style={{ padding: '12px 14px', borderRadius: 10, background: '#faf8ff', border: '1px solid #ede9fe', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#1e1b4b' }}>{user?.name}</p>
+            <p style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{user?.email}</p>
           </div>
           <button className="btn btn-secondary btn-sm" style={{ width: '100%' }} onClick={handleLogout}>
-            🚪 Logout
+            <HiArrowRightOnRectangle style={{ fontSize: 16 }} />
+            <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -78,30 +105,31 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
         {/* Top bar */}
         <header style={{
-          height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 28px',
-          borderBottom: '1px solid #e2e8f0',
+          height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 32px',
+          borderBottom: '1px solid #ede9fe',
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
           position: 'sticky', top: 0, zIndex: 40,
         }}>
-          <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a' }}>
+          <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#1e1b4b' }}>
             {sidebarLinks.find(l => isActive(l.to))?.label ?? 'Dashboard'}
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>Welcome, {user?.name?.split(' ')[0]}</span>
+            <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 600 }}>Welcome, {user?.name?.split(' ')[0]}</span>
             <div style={{
-              width: 34, height: 34, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 14, fontWeight: 700, color: 'white',
+              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
             }}>
               {user?.name?.charAt(0).toUpperCase()}
             </div>
           </div>
         </header>
 
-        <main style={{ flex: 1, padding: 28 }} className="page-enter">
+        <main style={{ flex: 1, padding: 32 }}>
           {children}
         </main>
       </div>

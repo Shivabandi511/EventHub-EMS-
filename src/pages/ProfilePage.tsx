@@ -1,5 +1,14 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  HiUser, 
+  HiEnvelope, 
+  HiPhone, 
+  HiPencilSquare, 
+  HiCheckCircle, 
+  HiExclamationTriangle, 
+  HiShieldCheck 
+} from 'react-icons/hi2';
 import { profileService } from '../services/bookingService';
 import CustomerLayout from '../layouts/CustomerLayout';
 import { useAuth } from '../context/AuthContext';
@@ -39,27 +48,33 @@ export default function ProfilePage() {
 
   return (
     <CustomerLayout>
-      <div className="container-app" style={{ padding: '40px 24px', maxWidth: 580 }}>
-        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#0f172a', marginBottom: 32 }}>
-          My Profile
+      <div className="container-app page-container" style={{ maxWidth: 620 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1e1b4b', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="booking-icon-box">
+            <HiUser />
+          </div>
+          <span>My Profile</span>
         </h1>
 
         {/* Avatar card */}
         <div className="glass-card" style={{ padding: 28, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{
-            width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
-            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+            width: 76, height: 76, borderRadius: '50%', flexShrink: 0,
+            background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, fontWeight: 800, color: 'white',
-            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.25)',
+            fontSize: 30, fontWeight: 800, color: 'white',
+            boxShadow: '0 8px 24px rgba(124, 58, 237, 0.25)',
           }}>
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 4 }}>{user?.name}</h2>
-            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>✉️ {user?.email}</p>
-            <span className={`badge ${user?.role === 'ADMIN' ? 'badge-purple' : 'badge-cyan'}`}>
-              {user?.role === 'ADMIN' ? '👑 Admin' : '👤 Customer'}
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e1b4b', marginBottom: 4 }}>{user?.name}</h2>
+            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <HiEnvelope style={{ color: '#7c3aed' }} />
+              <span>{user?.email}</span>
+            </p>
+            <span className={`badge ${user?.role === 'ADMIN' ? 'badge-purple' : 'badge-green'}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              {user?.role === 'ADMIN' ? <><HiShieldCheck /> Administrator</> : <><HiUser /> Customer</>}
             </span>
           </div>
         </div>
@@ -68,49 +83,65 @@ export default function ProfilePage() {
         {success && (
           <div style={{
             background: '#ecfdf5', border: '1px solid #a7f3d0',
-            borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-            fontSize: 13, color: '#059669',
+            borderRadius: 12, padding: '12px 16px', marginBottom: 20,
+            fontSize: 13, color: '#065f46', display: 'flex', alignItems: 'center', gap: 8,
           }}>
-            ✅ {success}
+            <HiCheckCircle style={{ fontSize: 18 }} />
+            <span>{success}</span>
           </div>
         )}
 
         {/* Edit form */}
         <div className="glass-card" style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a' }}>Personal Information</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e1b4b' }}>Account Information</h3>
             {!editing && (
-              <button id="btn-edit-profile" className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>✏️ Edit</button>
+              <button id="btn-edit-profile" className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>
+                <HiPencilSquare style={{ fontSize: 14 }} />
+                <span>Edit Profile</span>
+              </button>
             )}
           </div>
 
           {editing ? (
             <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               <div>
-                <label className="label" htmlFor="profile-name">Full Name</label>
+                <label className="label" htmlFor="profile-name">
+                  <HiUser style={{ fontSize: 14, color: '#7c3aed' }} />
+                  <span>Full Name</span>
+                </label>
                 <input id="profile-name" className={`input${errors.name ? ' error' : ''}`}
                   value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
                 {errors.name && <p className="error-text">{errors.name}</p>}
               </div>
+
               <div>
-                <label className="label" htmlFor="profile-phone">Phone</label>
+                <label className="label" htmlFor="profile-phone">
+                  <HiPhone style={{ fontSize: 14, color: '#7c3aed' }} />
+                  <span>Phone Number</span>
+                </label>
                 <input id="profile-phone" type="tel" className={`input${errors.phone ? ' error' : ''}`}
                   placeholder="9876543210" value={form.phone}
                   onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
                 {errors.phone && <p className="error-text">{errors.phone}</p>}
               </div>
+
               <div>
-                <label className="label">Email (cannot change)</label>
-                <input className="input" value={user?.email} disabled style={{ opacity: 0.6, cursor: 'not-allowed', background: '#f1f5f9' }} />
+                <label className="label">
+                  <HiEnvelope style={{ fontSize: 14, color: '#7c3aed' }} />
+                  <span>Email (read-only)</span>
+                </label>
+                <input className="input" value={user?.email} disabled style={{ opacity: 0.65, cursor: 'not-allowed', background: '#faf8ff' }} />
               </div>
 
               {mutation.isError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#b91c1c' }}>
-                  ⚠️ Failed to update profile. Try again.
+                <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#be123c', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <HiExclamationTriangle style={{ fontSize: 18 }} />
+                  <span>Failed to update profile. Please try again.</span>
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
                 <button id="btn-save-profile" type="submit" className="btn btn-primary" disabled={mutation.isPending}>
                   {mutation.isPending ? 'Saving…' : 'Save Changes'}
                 </button>
@@ -120,13 +151,16 @@ export default function ProfilePage() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {[
-                { label: 'Full Name', value: user?.name },
-                { label: 'Email',     value: user?.email },
-                { label: 'Phone',     value: user?.phone ?? 'Not provided' },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: 16 }}>
-                  <p style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{label}</p>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>{value}</p>
+                { icon: <HiUser style={{ color: '#7c3aed' }} />, label: 'Full Name', value: user?.name },
+                { icon: <HiEnvelope style={{ color: '#7c3aed' }} />, label: 'Email Address', value: user?.email },
+                { icon: <HiPhone style={{ color: '#7c3aed' }} />, label: 'Phone Number',  value: user?.phone ?? 'Not provided' },
+              ].map(({ icon, label, value }) => (
+                <div key={label} style={{ borderBottom: '1px solid #ede9fe', paddingBottom: 14 }}>
+                  <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {icon}
+                    <span>{label}</span>
+                  </p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#1e1b4b' }}>{value}</p>
                 </div>
               ))}
             </div>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="techPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1035" />
+      <stop offset="50%" stop-color="#3b0764" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#techPurple)" />
+  <circle cx="680" cy="90" r="190" fill="url(#amberGlow)" />
+  <circle cx="120" cy="380" r="160" fill="#a855f7" fill-opacity="0.2" />
+  
+  <!-- Circuit Grid -->
+  <g stroke="#c084fc" stroke-width="1.5" stroke-opacity="0.35" fill="none">
+    <path d="M 50 120 L 190 120 L 250 180 L 460 180" />
+    <path d="M 80 340 L 210 340 L 290 260 L 520 260" />
+    <path d="M 620 60 L 620 210 L 560 270 L 340 270" />
+    <circle cx="190" cy="120" r="4" fill="#f59e0b" />
+    <circle cx="460" cy="180" r="5" fill="#c084fc" />
+    <circle cx="210" cy="340" r="4" fill="#10b981" />
+    <circle cx="560" cy="270" r="5" fill="#f59e0b" />
+  </g>
+  
+  <!-- Icon Badge -->
+  <g transform="translate(400, 150)">
+    <rect x="-44" y="-44" width="88" height="88" rx="22" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2" />
+    <rect x="-20" y="-20" width="40" height="40" rx="8" fill="none" stroke="#f59e0b" stroke-width="3" />
+    <circle cx="0" cy="0" r="7" fill="#c084fc" />
+    <path d="M 0 -20 L 0 -28 M 0 20 L 0 28 M -20 0 L -28 0 M 20 0 L 28 0" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" />
+  </g>
+  
+  <text x="400" y="275" font-family="'Outfit', sans-serif" font-size="28" font-weight="800" fill="#ffffff" text-anchor="middle">Technology &amp; AI Expo</text>
+  <text x="400" y="310" font-family="'Inter', sans-serif" font-size="15" fill="#e9d5ff" text-anchor="middle">Software · Artificial Intelligence · Cloud Systems</text>
+  <rect x="335" y="338" width="130" height="28" rx="14" fill="#a855f7" fill-opacity="0.25" stroke="#c084fc" stroke-width="1.5" />
+  <text x="400" y="357" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#faf5ff" text-anchor="middle">TECH &amp; CODE</text>
+</svg>

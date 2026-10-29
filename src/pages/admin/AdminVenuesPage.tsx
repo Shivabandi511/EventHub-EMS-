@@ -1,5 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  HiMapPin, 
+  HiPlus, 
+  HiPencilSquare, 
+  HiTrash, 
+  HiXMark 
+} from 'react-icons/hi2';
 import { venueService, type Venue } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
@@ -41,93 +48,113 @@ export default function AdminVenuesPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: 900 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+      <div className="page-container" style={{ maxWidth: 960, padding: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a' }}>Venue Management</h1>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiMapPin style={{ color: '#7c3aed' }} />
+              <span>Venue Management</span>
+            </h1>
             <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>{venues.length} venues registered</p>
           </div>
-          <button id="btn-create-venue" className="btn btn-primary" onClick={openCreate}>➕ Add Venue</button>
+          <button id="btn-create-venue" className="btn btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <HiPlus />
+            <span>Add Venue</span>
+          </button>
         </div>
 
-        <div className="glass-card" style={{ overflow: 'hidden' }}>
+        <div className="table-container">
           {isLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}><div className="spinner" style={{ width: 40, height: 40 }} /></div>
           ) : venues.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 60 }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>📍</div>
-              <p style={{ color: '#64748b' }}>No venues yet.</p>
+            <div className="state-box">
+              <div style={{ fontSize: 48, color: '#94a3b8', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+                <HiMapPin />
+              </div>
+              <p style={{ color: '#64748b' }}>No venues registered yet.</p>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                  {['Venue', 'City', 'Address', 'Capacity', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 18px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {venues.map((v: Venue) => (
-                  <tr key={v.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                    <td style={{ padding: '14px 18px', fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{v.name}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{v.city}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{v.address}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#2563eb', fontWeight: 700 }}>{v.capacity?.toLocaleString('en-IN')}</td>
-                    <td style={{ padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(v)}>✏️ Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => setDeleteConfirm(v.id)}>🗑️</button>
-                      </div>
-                    </td>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {['Venue Name', 'City', 'Address', 'Capacity', 'Actions'].map(h => (
+                      <th key={h}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {venues.map((v: Venue) => (
+                    <tr key={v.id}>
+                      <td style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{v.name}</td>
+                      <td style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>{v.city}</td>
+                      <td style={{ fontSize: 13, color: '#64748b' }}>{v.address}</td>
+                      <td style={{ fontSize: 13, color: '#059669', fontWeight: 700 }}>{v.capacity?.toLocaleString('en-IN')} seats</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-secondary btn-sm" onClick={() => openEdit(v)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <HiPencilSquare style={{ fontSize: 14 }} />
+                            <span>Edit</span>
+                          </button>
+                          <button className="btn btn-danger btn-sm" onClick={() => setDeleteConfirm(v.id)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <HiTrash style={{ fontSize: 14 }} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
 
       {/* Modal */}
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-          onClick={e => e.target === e.currentTarget && setShowModal(false)}>
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 20, padding: 32, width: '100%', maxWidth: 480, boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)' }}>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 24 }}>
-              {editItem ? '✏️ Edit Venue' : '➕ Add Venue'}
-            </h2>
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
+          <div className="modal-box" style={{ maxWidth: 480 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+                {editItem ? <><HiPencilSquare style={{ color: '#7c3aed' }} /> Edit Venue</> : <><HiPlus style={{ color: '#7c3aed' }} /> Add Venue</>}
+              </h2>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
+                <HiXMark />
+              </button>
+            </div>
+
             <form onSubmit={e => { e.preventDefault(); if (validate()) saveMutation.mutate(); }} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label className="label" htmlFor="venue-name">Venue Name *</label>
-                <input id="venue-name" className={`input${errors.name ? ' error' : ''}`} placeholder="e.g. HICC, Hyderabad"
+                <label className="label" htmlFor="vn-name">Venue Name *</label>
+                <input id="vn-name" className={`input${errors.name ? ' error' : ''}`} placeholder="e.g. HITEX Exhibition Center"
                   value={form.name ?? ''} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
                 {errors.name && <p className="error-text">{errors.name}</p>}
               </div>
+
               <div>
-                <label className="label" htmlFor="venue-address">Address *</label>
-                <input id="venue-address" className={`input${errors.address ? ' error' : ''}`} placeholder="Street address"
+                <label className="label" htmlFor="vn-city">City *</label>
+                <input id="vn-city" className={`input${errors.city ? ' error' : ''}`} placeholder="e.g. Hyderabad"
+                  value={form.city ?? ''} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} />
+                {errors.city && <p className="error-text">{errors.city}</p>}
+              </div>
+
+              <div>
+                <label className="label" htmlFor="vn-addr">Address *</label>
+                <input id="vn-addr" className={`input${errors.address ? ' error' : ''}`} placeholder="Street / Area address"
                   value={form.address ?? ''} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} />
                 {errors.address && <p className="error-text">{errors.address}</p>}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label className="label" htmlFor="venue-city">City *</label>
-                  <input id="venue-city" className={`input${errors.city ? ' error' : ''}`} placeholder="e.g. Hyderabad"
-                    value={form.city ?? ''} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} />
-                  {errors.city && <p className="error-text">{errors.city}</p>}
-                </div>
-                <div>
-                  <label className="label" htmlFor="venue-capacity">Capacity *</label>
-                  <input id="venue-capacity" type="number" min="1" className={`input${errors.capacity ? ' error' : ''}`} placeholder="500"
-                    value={form.capacity ?? ''} onChange={e => setForm(p => ({ ...p, capacity: Number(e.target.value) }))} />
-                  {errors.capacity && <p className="error-text">{errors.capacity}</p>}
-                </div>
+
+              <div>
+                <label className="label" htmlFor="vn-cap">Capacity *</label>
+                <input id="vn-cap" type="number" min="1" className={`input${errors.capacity ? ' error' : ''}`} placeholder="e.g. 5000"
+                  value={form.capacity ?? ''} onChange={e => setForm(p => ({ ...p, capacity: Number(e.target.value) }))} />
+                {errors.capacity && <p className="error-text">{errors.capacity}</p>}
               </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button id="btn-save-venue" type="submit" className="btn btn-primary" disabled={saveMutation.isPending}>
-                  {saveMutation.isPending ? 'Saving…' : editItem ? 'Save Changes' : 'Add Venue'}
+                  {saveMutation.isPending ? 'Saving…' : editItem ? 'Save Changes' : 'Create Venue'}
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
               </div>
@@ -138,14 +165,16 @@ export default function AdminVenuesPage() {
 
       {/* Delete confirm */}
       {deleteConfirm !== null && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 110, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: '#ffffff', border: '1px solid #fecaca', borderRadius: 16, padding: 32, maxWidth: 360, width: '100%', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)' }}>
-            <div style={{ fontSize: 44, marginBottom: 14 }}>🗑️</div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>Delete Venue?</h3>
-            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Events at this venue may be affected.</p>
+        <div className="modal-overlay">
+          <div className="modal-box" style={{ maxWidth: 360, textAlign: 'center' }}>
+            <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+              <HiTrash />
+            </div>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Delete Venue?</h3>
+            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(deleteConfirm!)}>
-                {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+                {deleteMutation.isPending ? 'Deleting…' : 'Yes, Delete'}
               </button>
               <button className="btn btn-secondary" onClick={() => setDeleteConfirm(null)}>Cancel</button>
             </div>

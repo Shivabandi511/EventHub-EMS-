@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="musicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c0519" />
+      <stop offset="50%" stop-color="#831843" />
+      <stop offset="100%" stop-color="#be185d" />
+    </linearGradient>
+    <linearGradient id="amberPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#fb7185" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#musicGrad)" />
+  <circle cx="200" cy="120" r="150" fill="url(#amberPink)" fill-opacity="0.25" />
+  <circle cx="650" cy="350" r="180" fill="#7c3aed" fill-opacity="0.3" />
+  
+  <!-- Sound Waves -->
+  <g stroke="#fbcfe8" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.4">
+    <path d="M 150 250 Q 200 200 250 250 T 350 250 T 450 250 T 550 250 T 650 250" />
+    <path d="M 120 280 Q 180 230 240 280 T 360 280 T 480 280 T 600 280 T 680 280" />
+  </g>
+  
+  <!-- Music Icon -->
+  <g transform="translate(400, 150)">
+    <circle cx="0" cy="0" r="44" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2" />
+    <path d="M -10 14 A 10 7 0 1 1 -10 0 L -10 -16 L 16 -22 L 16 8 A 10 7 0 1 1 16 -6" fill="none" stroke="#fbcfe8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <ellipse cx="-16" cy="14" rx="7" ry="5" fill="#fbcfe8" />
+    <ellipse cx="10" cy="8" rx="7" ry="5" fill="#fbcfe8" />
+  </g>
+  
+  <text x="400" y="275" font-family="'Outfit', sans-serif" font-size="28" font-weight="800" fill="#ffffff" text-anchor="middle">Live Music &amp; Festival</text>
+  <text x="400" y="310" font-family="'Inter', sans-serif" font-size="15" fill="#fbcfe8" text-anchor="middle">Concerts · Acoustic Nights · Electric Beats</text>
+  <rect x="335" y="338" width="130" height="28" rx="14" fill="#fb7185" fill-opacity="0.25" stroke="#f43f5e" stroke-width="1.5" />
+  <text x="400" y="357" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">CONCERT</text>
+</svg>

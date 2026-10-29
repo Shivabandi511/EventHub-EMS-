@@ -1,48 +1,78 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { 
+  HiCalendar, 
+  HiMapPin, 
+  HiTicket, 
+  HiArrowRight, 
+  HiAdjustmentsHorizontal, 
+  HiMagnifyingGlass, 
+  HiExclamationTriangle, 
+  HiChevronLeft, 
+  HiChevronRight, 
+  HiXMark,
+  HiCpuChip,
+  HiMusicalNote,
+  HiBriefcase,
+  HiTrophy,
+  HiPaintBrush
+} from 'react-icons/hi2';
 import { eventService, categoryService, type Event, type Category } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
+import { getEventImage } from '../assets/images';
 
-const CATEGORIES_EMOJI: Record<string, string> = {
-  Music: '🎵', Tech: '💻', Sports: '⚽', Art: '🎨', Food: '🍽️',
-  Business: '💼', Education: '📚', Health: '❤️', Comedy: '😄', Dance: '💃',
+const CATEGORY_ICON: Record<string, React.ReactElement> = {
+  Technology: <HiCpuChip style={{ color: '#7c3aed' }} />,
+  Tech: <HiCpuChip style={{ color: '#7c3aed' }} />,
+  'Music & Concerts': <HiMusicalNote style={{ color: '#ec4899' }} />,
+  Music: <HiMusicalNote style={{ color: '#ec4899' }} />,
+  'Business & Startup': <HiBriefcase style={{ color: '#059669' }} />,
+  Business: <HiBriefcase style={{ color: '#059669' }} />,
+  'Sports & Fitness': <HiTrophy style={{ color: '#d97706' }} />,
+  Sports: <HiTrophy style={{ color: '#d97706' }} />,
+  'Arts & Culture': <HiPaintBrush style={{ color: '#db2777' }} />,
+  Art: <HiPaintBrush style={{ color: '#db2777' }} />,
 };
 
 function EventCard({ event }: { event: Event }) {
   const navigate = useNavigate();
   const date = new Date(event.dateTime);
   const isSoldOut = event.availableSeats === 0;
+  const eventImg = getEventImage(event.imageUrl, event.category?.name);
 
   return (
-    <div className="event-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/events/${event.id}`)}>
-      <div style={{
-        height: 170, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
-        position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        borderBottom: '1px solid #e2e8f0',
-      }}>
-        {event.imageUrl
-          ? <img src={event.imageUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span style={{ fontSize: 48 }}>{CATEGORIES_EMOJI[event.category?.name] ?? '🎭'}</span>}
+    <div className="event-card" onClick={() => navigate(`/events/${event.id}`)} style={{ cursor: 'pointer' }}>
+      <div className="event-card-img-wrap">
+        <img src={eventImg} alt={event.title} />
         <div style={{ position: 'absolute', top: 10, right: 10 }}>
-          <span className={`badge ${isSoldOut ? 'badge-red' : 'badge-green'}`}>
+          <span className={`badge ${isSoldOut ? 'badge-rose' : 'badge-green'}`}>
             {isSoldOut ? 'Sold Out' : `${event.availableSeats} left`}
           </span>
         </div>
         <div style={{ position: 'absolute', top: 10, left: 10 }}>
-          <span className="badge badge-purple">{event.category?.name ?? 'Event'}</span>
+          <span className="badge badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            {CATEGORY_ICON[event.category?.name ?? '']}
+            <span>{event.category?.name ?? 'Event'}</span>
+          </span>
         </div>
       </div>
-      <div style={{ padding: '14px 16px 16px' }}>
-        <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 15, fontWeight: 700, color: '#0f172a', marginBottom: 8, lineHeight: 1.3 }}>
+
+      <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e1b4b', marginBottom: 8, lineHeight: 1.3 }}>
           {event.title}
         </h3>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 3 }}>
-          📅 {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <HiCalendar style={{ color: '#7c3aed', flexShrink: 0 }} />
+          <span>{date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
         </p>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 14 }}>📍 {event.venue?.name}, {event.venue?.city}</p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 17, fontWeight: 800, color: '#2563eb' }}>
+        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <HiMapPin style={{ color: '#e11d48', flexShrink: 0 }} />
+          <span>{event.venue?.name}, {event.venue?.city}</span>
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 12, borderTop: '1px solid #f3f0ff' }}>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>
             {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
           </span>
           <button
@@ -50,7 +80,9 @@ function EventCard({ event }: { event: Event }) {
             disabled={isSoldOut}
             onClick={e => { e.stopPropagation(); navigate(`/events/${event.id}`); }}
           >
-            {isSoldOut ? 'Sold Out' : 'Book →'}
+            <HiTicket />
+            <span>{isSoldOut ? 'Sold Out' : 'Book'}</span>
+            <HiArrowRight style={{ fontSize: 12 }} />
           </button>
         </div>
       </div>
@@ -114,140 +146,172 @@ export default function EventListingPage() {
 
   return (
     <CustomerLayout>
-      <div className="container-app" style={{ padding: '40px 24px' }}>
+      <div className="container-app page-container">
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
-            Browse Events
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1e1b4b', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <HiCalendar style={{ color: '#7c3aed' }} />
+            <span>Discover Events</span>
           </h1>
-          <p style={{ color: '#64748b', fontSize: 15 }}>
-            {isLoading ? 'Loading…' : `${totalItems} event${totalItems !== 1 ? 's' : ''} found`}
+          <p style={{ color: '#6b7280', fontSize: 15 }}>
+            {isLoading ? 'Loading events…' : `${totalItems} event${totalItems !== 1 ? 's' : ''} available`}
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '270px 1fr', gap: 28, alignItems: 'start' }}>
           {/* ── Filters Sidebar ── */}
-          <aside style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div className="glass-card" style={{ padding: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 15, fontWeight: 700, color: '#0f172a' }}>🔍 Filters</h3>
-                {hasFilters && (
-                  <button onClick={clearFilters} style={{ fontSize: 12, color: '#ef4444', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>Clear all</button>
-                )}
-              </div>
+          <aside className="filter-card">
+            <div className="filter-header">
+              <h3 className="filter-title">
+                <HiAdjustmentsHorizontal style={{ color: '#7c3aed', fontSize: 20 }} />
+                <span>Filters</span>
+              </h3>
+              {hasFilters && (
+                <button onClick={clearFilters} style={{ fontSize: 12, color: '#e11d48', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <HiXMark />
+                  <span>Clear all</span>
+                </button>
+              )}
+            </div>
 
-              {/* Search */}
-              <div style={{ marginBottom: 16 }}>
-                <label className="label">Search</label>
+            {/* Search */}
+            <div style={{ marginBottom: 16 }}>
+              <label className="label">Search Events</label>
+              <div style={{ position: 'relative' }}>
                 <input
-                  id="filter-search" className="input" placeholder="Event name…"
+                  id="filter-search" className="input" placeholder="Search keywords…"
                   value={filters.search}
                   onChange={e => applyFilter('search', e.target.value)}
-                  style={{ fontSize: 13 }}
+                  style={{ fontSize: 13, paddingLeft: 36 }}
                 />
+                <HiMagnifyingGlass style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: 16 }} />
               </div>
+            </div>
 
-              {/* Category */}
-              {categories.length > 0 && (
-                <div style={{ marginBottom: 16 }}>
-                  <label className="label">Category</label>
-                  <select
-                    id="filter-category" className="input"
-                    value={filters.categoryId}
-                    onChange={e => applyFilter('categoryId', e.target.value)}
-                    style={{ fontSize: 13 }}
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((c: Category) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* City */}
+            {/* Category */}
+            {categories.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <label className="label">City</label>
-                <input
-                  id="filter-city" className="input" placeholder="e.g. Hyderabad"
-                  value={filters.city}
-                  onChange={e => applyFilter('city', e.target.value)}
+                <label className="label">Category</label>
+                <select
+                  id="filter-category" className="input"
+                  value={filters.categoryId}
+                  onChange={e => applyFilter('categoryId', e.target.value)}
                   style={{ fontSize: 13 }}
-                />
-              </div>
-
-              {/* Date range */}
-              <div style={{ marginBottom: 16 }}>
-                <label className="label">From Date</label>
-                <input id="filter-from" className="input" type="date" value={filters.fromDate} onChange={e => applyFilter('fromDate', e.target.value)} style={{ fontSize: 13 }} />
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <label className="label">To Date</label>
-                <input id="filter-to" className="input" type="date" value={filters.toDate} onChange={e => applyFilter('toDate', e.target.value)} style={{ fontSize: 13 }} />
-              </div>
-
-              {/* Price */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
-                <div>
-                  <label className="label">Min ₹</label>
-                  <input id="filter-minprice" className="input" type="number" min="0" placeholder="0" value={filters.minPrice} onChange={e => applyFilter('minPrice', e.target.value)} style={{ fontSize: 13 }} />
-                </div>
-                <div>
-                  <label className="label">Max ₹</label>
-                  <input id="filter-maxprice" className="input" type="number" min="0" placeholder="∞" value={filters.maxPrice} onChange={e => applyFilter('maxPrice', e.target.value)} style={{ fontSize: 13 }} />
-                </div>
-              </div>
-
-              {/* Sort */}
-              <div>
-                <label className="label">Sort by</label>
-                <select id="filter-sort" className="input" value={filters.sort} onChange={e => applyFilter('sort', e.target.value)} style={{ fontSize: 13 }}>
-                  <option value="dateTime">Date (Earliest)</option>
-                  <option value="price">Price (Low→High)</option>
-                  <option value="price,desc">Price (High→Low)</option>
-                  <option value="title">Name (A→Z)</option>
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((c: Category) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
               </div>
+            )}
+
+            {/* City */}
+            <div style={{ marginBottom: 16 }}>
+              <label className="label">City / Location</label>
+              <input
+                id="filter-city" className="input" placeholder="e.g. Hyderabad, Bangalore"
+                value={filters.city}
+                onChange={e => applyFilter('city', e.target.value)}
+                style={{ fontSize: 13 }}
+              />
+            </div>
+
+            {/* Date range */}
+            <div style={{ marginBottom: 16 }}>
+              <label className="label">From Date</label>
+              <input id="filter-from" className="input" type="date" value={filters.fromDate} onChange={e => applyFilter('fromDate', e.target.value)} style={{ fontSize: 13 }} />
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label className="label">To Date</label>
+              <input id="filter-to" className="input" type="date" value={filters.toDate} onChange={e => applyFilter('toDate', e.target.value)} style={{ fontSize: 13 }} />
+            </div>
+
+            {/* Price */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+              <div>
+                <label className="label">Min (₹)</label>
+                <input id="filter-minprice" className="input" type="number" min="0" placeholder="0" value={filters.minPrice} onChange={e => applyFilter('minPrice', e.target.value)} style={{ fontSize: 13 }} />
+              </div>
+              <div>
+                <label className="label">Max (₹)</label>
+                <input id="filter-maxprice" className="input" type="number" min="0" placeholder="Max" value={filters.maxPrice} onChange={e => applyFilter('maxPrice', e.target.value)} style={{ fontSize: 13 }} />
+              </div>
+            </div>
+
+            {/* Sort */}
+            <div>
+              <label className="label">Sort By</label>
+              <select id="filter-sort" className="input" value={filters.sort} onChange={e => applyFilter('sort', e.target.value)} style={{ fontSize: 13 }}>
+                <option value="dateTime">Date (Earliest First)</option>
+                <option value="price">Price (Low to High)</option>
+                <option value="price,desc">Price (High to Low)</option>
+                <option value="title">Title (A → Z)</option>
+              </select>
             </div>
           </aside>
 
           {/* ── Events Grid ── */}
-          <div style={{ flex: 1 }}>
+          <div>
             {isLoading ? (
               <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
                 <div className="spinner" style={{ width: 44, height: 44 }} />
               </div>
             ) : isError ? (
-              <div style={{
-                textAlign: 'center', padding: 60,
-                background: '#fef2f2', borderRadius: 16, border: '1px dashed #fecaca',
-              }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
-                <h3 style={{ fontFamily: 'Outfit,sans-serif', color: '#b91c1c', marginBottom: 8 }}>Failed to load events</h3>
-                <p style={{ fontSize: 14, color: '#64748b' }}>Make sure the backend is running on port 8080.</p>
+              <div className="state-box" style={{ background: '#fff1f2', borderColor: '#fecdd3' }}>
+                <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+                  <HiExclamationTriangle />
+                </div>
+                <h3 style={{ color: '#be123c', fontWeight: 700, marginBottom: 8 }}>Failed to load events</h3>
+                <p style={{ fontSize: 14, color: '#6b7280' }}>Please verify the backend connection.</p>
               </div>
             ) : events.length === 0 ? (
-              <div style={{
-                textAlign: 'center', padding: 80,
-                background: '#ffffff', borderRadius: 16, border: '1px dashed #cbd5e1',
-              }}>
-                <div style={{ fontSize: 52, marginBottom: 16 }}>🔍</div>
-                <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, color: '#0f172a', marginBottom: 8 }}>No events found</h3>
-                <p style={{ fontSize: 14, color: '#64748b', marginBottom: 20 }}>Try adjusting your filters.</p>
-                <button className="btn btn-secondary" onClick={clearFilters}>Clear Filters</button>
+              <div className="state-box">
+                <div className="state-icon">
+                  <HiMagnifyingGlass />
+                </div>
+                <h3 style={{ fontSize: 20, color: '#1e1b4b', marginBottom: 8 }}>No events matched your search</h3>
+                <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 20 }}>Try relaxing your filters or searching for something else.</p>
+                <button className="btn btn-secondary btn-sm" onClick={clearFilters}>Reset Filters</button>
               </div>
             ) : (
               <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 22 }}>
                   {events.map(event => <EventCard key={event.id} event={event} />)}
                 </div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 40 }}>
-                    <button className="btn btn-secondary btn-sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>← Prev</button>
-                    <span style={{ fontSize: 13, color: '#64748b', padding: '0 12px' }}>Page {page + 1} of {totalPages}</span>
-                    <button className="btn btn-secondary btn-sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>Next →</button>
+                  <div className="pagination-container">
+                    <button
+                      className="pagination-btn"
+                      disabled={page === 0}
+                      onClick={() => setPage(p => p - 1)}
+                    >
+                      <HiChevronLeft />
+                      <span>Prev</span>
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <button
+                        key={i}
+                        className={`pagination-btn ${page === i ? 'active' : ''}`}
+                        onClick={() => setPage(i)}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+
+                    <button
+                      className="pagination-btn"
+                      disabled={page >= totalPages - 1}
+                      onClick={() => setPage(p => p + 1)}
+                    >
+                      <span>Next</span>
+                      <HiChevronRight />
+                    </button>
+
+                    <span className="pagination-info">Page {page + 1} of {totalPages}</span>
                   </div>
                 )}
               </>
