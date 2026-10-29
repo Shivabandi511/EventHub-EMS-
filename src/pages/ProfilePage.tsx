@@ -40,7 +40,7 @@ export default function ProfilePage() {
   return (
     <CustomerLayout>
       <div className="container-app" style={{ padding: '40px 24px', maxWidth: 580 }}>
-        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#e2e8f0', marginBottom: 32 }}>
+        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#0f172a', marginBottom: 32 }}>
           My Profile
         </h1>
 
@@ -48,15 +48,15 @@ export default function ProfilePage() {
         <div className="glass-card" style={{ padding: 28, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{
             width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
-            background: 'linear-gradient(135deg,#7c3aed,#06b6d4)',
+            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 28, fontWeight: 800, color: 'white',
-            boxShadow: '0 8px 24px rgba(124,58,237,0.4)',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.25)',
           }}>
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>{user?.name}</h2>
+            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 4 }}>{user?.name}</h2>
             <p style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>✉️ {user?.email}</p>
             <span className={`badge ${user?.role === 'ADMIN' ? 'badge-purple' : 'badge-cyan'}`}>
               {user?.role === 'ADMIN' ? '👑 Admin' : '👤 Customer'}
@@ -67,9 +67,9 @@ export default function ProfilePage() {
         {/* Success message */}
         {success && (
           <div style={{
-            background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)',
+            background: '#ecfdf5', border: '1px solid #a7f3d0',
             borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-            fontSize: 13, color: '#4ade80',
+            fontSize: 13, color: '#059669',
           }}>
             ✅ {success}
           </div>
@@ -78,7 +78,7 @@ export default function ProfilePage() {
         {/* Edit form */}
         <div className="glass-card" style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>Personal Information</h3>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a' }}>Personal Information</h3>
             {!editing && (
               <button id="btn-edit-profile" className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>✏️ Edit</button>
             )}
@@ -101,11 +101,11 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label className="label">Email (cannot change)</label>
-                <input className="input" value={user?.email} disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} />
+                <input className="input" value={user?.email} disabled style={{ opacity: 0.6, cursor: 'not-allowed', background: '#f1f5f9' }} />
               </div>
 
               {mutation.isError && (
-                <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#f87171' }}>
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#b91c1c' }}>
                   ⚠️ Failed to update profile. Try again.
                 </div>
               )}
@@ -124,9 +124,9 @@ export default function ProfilePage() {
                 { label: 'Email',     value: user?.email },
                 { label: 'Phone',     value: user?.phone ?? 'Not provided' },
               ].map(({ label, value }) => (
-                <div key={label} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 16 }}>
+                <div key={label} style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: 16 }}>
                   <p style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{label}</p>
-                  <p style={{ fontSize: 15, fontWeight: 500, color: '#e2e8f0' }}>{value}</p>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>{value}</p>
                 </div>
               ))}
             </div>

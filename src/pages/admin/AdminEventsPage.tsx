@@ -100,7 +100,7 @@ export default function AdminEventsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#e2e8f0' }}>Event Management</h1>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a' }}>Event Management</h1>
             <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>{data?.data?.totalElements ?? 0} total events</p>
           </div>
           <button id="btn-create-event" className="btn btn-primary" onClick={openCreate}>➕ Create Event</button>
@@ -120,25 +120,25 @@ export default function AdminEventsPage() {
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
                   {['Event', 'Category', 'Date', 'Price', 'Seats', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '14px 18px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                    <th key={h} style={{ padding: '14px 18px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {events.map((ev: Event) => (
-                  <tr key={ev.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                  <tr key={ev.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.15s' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                     <td style={{ padding: '14px 18px' }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{ev.title}</p>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{ev.title}</p>
                       <p style={{ fontSize: 12, color: '#64748b' }}>📍 {ev.venue?.city}</p>
                     </td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#94a3b8' }}>{ev.category?.name}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#94a3b8' }}>{new Date(ev.dateTime).toLocaleDateString('en-IN')}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#a78bfa' }}>{ev.price === 0 ? 'Free' : `₹${ev.price}`}</td>
-                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#94a3b8' }}>{ev.availableSeats}/{ev.totalSeats}</td>
+                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{ev.category?.name}</td>
+                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{new Date(ev.dateTime).toLocaleDateString('en-IN')}</td>
+                    <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: '#2563eb' }}>{ev.price === 0 ? 'Free' : `₹${ev.price}`}</td>
+                    <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{ev.availableSeats}/{ev.totalSeats}</td>
                     <td style={{ padding: '14px 18px' }}>
                       <span className={`badge ${ev.status === 'ACTIVE' ? 'badge-green' : ev.status === 'CANCELLED' ? 'badge-red' : 'badge-yellow'}`}>{ev.status}</span>
                     </td>
@@ -169,15 +169,16 @@ export default function AdminEventsPage() {
       {showModal && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 100,
-          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
+          background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
         }} onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div style={{
-            background: '#10102a', border: '1px solid rgba(255,255,255,0.1)',
+            background: '#ffffff', border: '1px solid #e2e8f0',
             borderRadius: 20, padding: 32, width: '100%', maxWidth: 600,
             maxHeight: '90vh', overflowY: 'auto',
+            boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)',
           }}>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#e2e8f0', marginBottom: 24 }}>
+            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 24 }}>
               {editEvent ? '✏️ Edit Event' : '➕ Create Event'}
             </h2>
 
@@ -268,12 +269,12 @@ export default function AdminEventsPage() {
       {deleteConfirm !== null && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 110,
-          background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)',
+          background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
         }}>
-          <div style={{ background: '#10102a', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 16, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center' }}>
+          <div style={{ background: '#ffffff', border: '1px solid #fecaca', borderRadius: 16, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.2)' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🗑️</div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#e2e8f0', marginBottom: 10 }}>Delete Event?</h3>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Delete Event?</h3>
             <p style={{ fontSize: 14, color: '#64748b', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending}

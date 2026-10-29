@@ -49,7 +49,7 @@ export default function EventDetailPage() {
           {' / '}
           <Link to="/events" style={{ color: '#64748b', textDecoration: 'none' }}>Events</Link>
           {' / '}
-          <span style={{ color: '#a78bfa' }}>{event.title}</span>
+          <span style={{ color: '#2563eb', fontWeight: 600 }}>{event.title}</span>
         </nav>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 32, alignItems: 'start' }}>
@@ -58,10 +58,10 @@ export default function EventDetailPage() {
             {/* Event Image / Placeholder */}
             <div style={{
               height: 340, borderRadius: 20, overflow: 'hidden',
-              background: 'linear-gradient(135deg, #1a1a3e 0%, #252552 50%, #1e1e4a 100%)',
+              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               marginBottom: 32, position: 'relative',
-              border: '1px solid rgba(255,255,255,0.07)',
+              border: '1px solid #e2e8f0',
             }}>
               {event.imageUrl
                 ? <img src={event.imageUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -74,7 +74,7 @@ export default function EventDetailPage() {
             </div>
 
             {/* Title */}
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 800, color: '#f1f5f9', marginBottom: 20, lineHeight: 1.2 }}>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 800, color: '#0f172a', marginBottom: 20, lineHeight: 1.2 }}>
               {event.title}
             </h1>
 
@@ -90,17 +90,17 @@ export default function EventDetailPage() {
               ].map(({ icon, label, value }) => (
                 <div key={label} className="glass-card" style={{ padding: '14px 18px' }}>
                   <p style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{icon} {label}</p>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: '#e2e8f0' }}>{value}</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>{value}</p>
                 </div>
               ))}
             </div>
 
             {/* Description */}
             <div>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#e2e8f0', marginBottom: 12 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
                 About This Event
               </h2>
-              <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.8 }}>
+              <p style={{ fontSize: 15, color: '#334155', lineHeight: 1.8 }}>
                 {event.description ?? 'No description provided.'}
               </p>
             </div>
@@ -108,10 +108,10 @@ export default function EventDetailPage() {
 
           {/* ── Right: Booking Card ── */}
           <div style={{ position: 'sticky', top: 90 }}>
-            <div className="glass-card glow-sm" style={{ padding: 28 }}>
-              <div style={{ marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="glass-card" style={{ padding: 28, boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.08)' }}>
+              <div style={{ marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid #e2e8f0' }}>
                 <p style={{ fontSize: 13, color: '#64748b', marginBottom: 6 }}>Price per ticket</p>
-                <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 800, color: '#a78bfa' }}>
+                <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 36, fontWeight: 900, color: '#2563eb' }}>
                   {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
                 </p>
               </div>
@@ -125,11 +125,11 @@ export default function EventDetailPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                   <span style={{ color: '#64748b' }}>Seats Left</span>
-                  <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{event.availableSeats}</span>
+                  <span style={{ color: '#0f172a', fontWeight: 600 }}>{event.availableSeats}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                   <span style={{ color: '#64748b' }}>Venue Capacity</span>
-                  <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{event.venue?.capacity?.toLocaleString('en-IN')}</span>
+                  <span style={{ color: '#0f172a', fontWeight: 600 }}>{event.venue?.capacity?.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 

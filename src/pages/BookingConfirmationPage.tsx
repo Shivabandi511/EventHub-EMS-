@@ -29,11 +29,11 @@ export default function BookingConfirmationPage() {
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
             width: 88, height: 88, borderRadius: '50%', margin: '0 auto 20px',
-            background: 'rgba(34,197,94,0.12)', border: '2px solid rgba(34,197,94,0.3)',
+            background: '#ecfdf5', border: '2px solid #a7f3d0',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 40, boxShadow: '0 0 40px rgba(34,197,94,0.15)',
+            fontSize: 40, boxShadow: '0 4px 20px rgba(5,150,105,0.15)',
           }}>✅</div>
-          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#4ade80', marginBottom: 8 }}>
+          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#059669', marginBottom: 8 }}>
             Booking Confirmed!
           </h1>
           <p style={{ color: '#64748b', fontSize: 16 }}>
@@ -42,14 +42,14 @@ export default function BookingConfirmationPage() {
         </div>
 
         {booking ? (
-          <div className="glass-card" style={{ padding: 32, marginBottom: 24 }}>
+          <div className="glass-card" style={{ padding: 32, marginBottom: 24, boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.08)' }}>
             {/* Booking ID */}
             <div style={{
-              background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)',
+              background: '#eff6ff', border: '1px solid #bfdbfe',
               borderRadius: 12, padding: '14px 20px', marginBottom: 24, textAlign: 'center',
             }}>
               <p style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>Booking Reference</p>
-              <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#a78bfa', letterSpacing: 2 }}>
+              <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 900, color: '#1d4ed8', letterSpacing: 2 }}>
                 #EH{String(booking.id).padStart(6, '0')}
               </p>
             </div>
@@ -58,7 +58,7 @@ export default function BookingConfirmationPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <p style={{ fontSize: 12, color: '#64748b', marginBottom: 3 }}>Event</p>
-                <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>{booking.event?.title}</p>
+                <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a' }}>{booking.event?.title}</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 {[
@@ -67,16 +67,16 @@ export default function BookingConfirmationPage() {
                   { label: 'Tickets',     value: `${booking.ticketCount} ticket${booking.ticketCount > 1 ? 's' : ''}` },
                   { label: 'Total Paid',  value: booking.totalAmount === 0 ? 'Free' : `₹${booking.totalAmount.toLocaleString('en-IN')}` },
                 ].map(({ label, value }) => (
-                  <div key={label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '12px 14px' }}>
+                  <div key={label} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '12px 14px' }}>
                     <p style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>{label}</p>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{value}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{value}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="divider" />
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#475569' }}>
+            <p style={{ textAlign: 'center', fontSize: 12, color: '#64748b' }}>
               📧 A confirmation has been recorded. Bring this booking reference to the event.
             </p>
           </div>

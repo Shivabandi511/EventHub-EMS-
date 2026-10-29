@@ -17,8 +17,9 @@ function EventCard({ event }: { event: Event }) {
   return (
     <div className="event-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/events/${event.id}`)}>
       <div style={{
-        height: 170, background: 'linear-gradient(135deg, #1a1a3e, #252552)',
+        height: 170, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
         position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        borderBottom: '1px solid #e2e8f0',
       }}>
         {event.imageUrl
           ? <img src={event.imageUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -33,7 +34,7 @@ function EventCard({ event }: { event: Event }) {
         </div>
       </div>
       <div style={{ padding: '14px 16px 16px' }}>
-        <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 15, fontWeight: 700, color: '#e2e8f0', marginBottom: 8, lineHeight: 1.3 }}>
+        <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 15, fontWeight: 700, color: '#0f172a', marginBottom: 8, lineHeight: 1.3 }}>
           {event.title}
         </h3>
         <p style={{ fontSize: 12, color: '#64748b', marginBottom: 3 }}>
@@ -41,7 +42,7 @@ function EventCard({ event }: { event: Event }) {
         </p>
         <p style={{ fontSize: 12, color: '#64748b', marginBottom: 14 }}>📍 {event.venue?.name}, {event.venue?.city}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 17, fontWeight: 700, color: '#a78bfa' }}>
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#2563eb' }}>
             {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
           </span>
           <button
@@ -116,7 +117,7 @@ export default function EventListingPage() {
       <div className="container-app" style={{ padding: '40px 24px' }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#e2e8f0', marginBottom: 8 }}>
+          <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 32, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
             Browse Events
           </h1>
           <p style={{ color: '#64748b', fontSize: 15 }}>
@@ -129,9 +130,9 @@ export default function EventListingPage() {
           <aside style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="glass-card" style={{ padding: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 15, fontWeight: 700, color: '#e2e8f0' }}>🔍 Filters</h3>
+                <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 15, fontWeight: 700, color: '#0f172a' }}>🔍 Filters</h3>
                 {hasFilters && (
-                  <button onClick={clearFilters} style={{ fontSize: 12, color: '#f87171', background: 'none', border: 'none', cursor: 'pointer' }}>Clear all</button>
+                  <button onClick={clearFilters} style={{ fontSize: 12, color: '#ef4444', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>Clear all</button>
                 )}
               </div>
 
@@ -219,19 +220,19 @@ export default function EventListingPage() {
             ) : isError ? (
               <div style={{
                 textAlign: 'center', padding: 60,
-                background: 'rgba(239,68,68,0.05)', borderRadius: 16, border: '1px dashed rgba(239,68,68,0.2)',
+                background: '#fef2f2', borderRadius: 16, border: '1px dashed #fecaca',
               }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
-                <h3 style={{ fontFamily: 'Outfit,sans-serif', color: '#f87171', marginBottom: 8 }}>Failed to load events</h3>
+                <h3 style={{ fontFamily: 'Outfit,sans-serif', color: '#b91c1c', marginBottom: 8 }}>Failed to load events</h3>
                 <p style={{ fontSize: 14, color: '#64748b' }}>Make sure the backend is running on port 8080.</p>
               </div>
             ) : events.length === 0 ? (
               <div style={{
                 textAlign: 'center', padding: 80,
-                background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.06)',
+                background: '#ffffff', borderRadius: 16, border: '1px dashed #cbd5e1',
               }}>
                 <div style={{ fontSize: 52, marginBottom: 16 }}>🔍</div>
-                <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, color: '#e2e8f0', marginBottom: 8 }}>No events found</h3>
+                <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, color: '#0f172a', marginBottom: 8 }}>No events found</h3>
                 <p style={{ fontSize: 14, color: '#64748b', marginBottom: 20 }}>Try adjusting your filters.</p>
                 <button className="btn btn-secondary" onClick={clearFilters}>Clear Filters</button>
               </div>

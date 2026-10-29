@@ -92,10 +92,10 @@ export default function BookingPage() {
           {' / '}
           <Link to={`/events/${eventId}`} style={{ color: '#64748b', textDecoration: 'none' }}>{event.title}</Link>
           {' / '}
-          <span style={{ color: '#a78bfa' }}>Book Tickets</span>
+          <span style={{ color: '#2563eb', fontWeight: 600 }}>Book Tickets</span>
         </nav>
 
-        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 30, fontWeight: 800, color: '#e2e8f0', marginBottom: 32 }}>
+        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 30, fontWeight: 800, color: '#0f172a', marginBottom: 32 }}>
           🎟️ Book Tickets
         </h1>
 
@@ -105,13 +105,13 @@ export default function BookingPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Ticket Count */}
               <div className="glass-card" style={{ padding: 24 }}>
-                <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#e2e8f0', marginBottom: 16 }}>
+                <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>
                   Number of Tickets
                 </h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   <button type="button" className="btn btn-secondary" style={{ width: 40, height: 40, borderRadius: '50%', padding: 0, fontSize: 20 }}
                     onClick={() => updateTicketCount(Math.max(1, ticketCount - 1))}>−</button>
-                  <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 800, color: '#a78bfa', minWidth: 40, textAlign: 'center' }}>
+                  <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 900, color: '#2563eb', minWidth: 40, textAlign: 'center' }}>
                     {ticketCount}
                   </span>
                   <button type="button" className="btn btn-secondary" style={{ width: 40, height: 40, borderRadius: '50%', padding: 0, fontSize: 20 }}
@@ -123,14 +123,14 @@ export default function BookingPage() {
 
               {/* Attendee Details */}
               <div className="glass-card" style={{ padding: 24 }}>
-                <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#e2e8f0', marginBottom: 20 }}>
+                <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 20 }}>
                   Attendee Details
                 </h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                   {attendees.map((at, i) => (
                     <div key={i}>
                       {ticketCount > 1 && (
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#a78bfa', marginBottom: 12 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#2563eb', marginBottom: 12 }}>
                           Attendee {i + 1}
                         </p>
                       )}
@@ -165,30 +165,30 @@ export default function BookingPage() {
 
             {/* Right: Summary */}
             <div style={{ position: 'sticky', top: 90 }}>
-              <div className="glass-card glow-sm" style={{ padding: 24 }}>
-                <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#e2e8f0', marginBottom: 20 }}>
+              <div className="glass-card" style={{ padding: 24, boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.08)' }}>
+                <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 20 }}>
                   Order Summary
                 </h2>
-                <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: '#e2e8f0', marginBottom: 4 }}>{event.title}</p>
+                <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', marginBottom: 4 }}>{event.title}</p>
                   <p style={{ fontSize: 13, color: '#64748b' }}>📅 {new Date(event.dateTime).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}</p>
                   <p style={{ fontSize: 13, color: '#64748b' }}>📍 {event.venue?.name}, {event.venue?.city}</p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                    <span style={{ color: '#94a3b8' }}>Price × {ticketCount}</span>
-                    <span style={{ color: '#e2e8f0' }}>₹{event.price} × {ticketCount}</span>
+                    <span style={{ color: '#64748b' }}>Price × {ticketCount}</span>
+                    <span style={{ color: '#0f172a', fontWeight: 600 }}>₹{event.price} × {ticketCount}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                    <span style={{ color: '#e2e8f0', fontWeight: 700 }}>Total</span>
-                    <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#a78bfa' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, paddingTop: 10, borderTop: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#0f172a', fontWeight: 700 }}>Total</span>
+                    <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 900, color: '#2563eb' }}>
                       {totalAmount === 0 ? 'Free' : `₹${totalAmount.toLocaleString('en-IN')}`}
                     </span>
                   </div>
                 </div>
 
                 {mutation.isError && (
-                  <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#f87171' }}>
+                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#b91c1c' }}>
                     ⚠️ {(axios.isAxiosError(mutation.error) && (mutation.error.response?.data as { message?: string })?.message) || 'Booking failed. Please try again.'}
                   </div>
                 )}
@@ -198,7 +198,7 @@ export default function BookingPage() {
                     ? <><span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} /> Booking…</>
                     : '✅ Confirm Booking'}
                 </button>
-                <p style={{ textAlign: 'center', fontSize: 12, color: '#475569', marginTop: 12 }}>
+                <p style={{ textAlign: 'center', fontSize: 12, color: '#64748b', marginTop: 12 }}>
                   🔒 Simulated payment — no real charge
                 </p>
               </div>
