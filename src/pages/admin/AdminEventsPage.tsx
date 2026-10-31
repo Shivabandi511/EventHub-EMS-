@@ -47,7 +47,7 @@ export default function AdminEventsPage() {
   const { data: cats } = useQuery({ queryKey: ['categories'], queryFn: () => categoryService.getAll(), retry: false });
   const { data: venues } = useQuery({ queryKey: ['venues'], queryFn: () => venueService.getAll(), retry: false });
 
-  const rawEvents  = data?.data?.content ?? [];
+  const rawEvents  = useMemo(() => data?.data?.content ?? [], [data?.data?.content]);
   const categories = cats?.data          ?? [];
   const venueList  = venues?.data        ?? [];
 

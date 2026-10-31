@@ -9,6 +9,7 @@ import {
   HiFunnel
 } from 'react-icons/hi2';
 import { bookingService, type Booking } from '../../services/bookingService';
+import type { PagedResponse } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
 const STATUS_OPTIONS = ['CONFIRMED', 'CANCELLED', 'PENDING'];
@@ -36,11 +37,15 @@ export default function AdminBookingsPage() {
   });
 
   const raw = data?.data;
-  const allBookings: Booking[] = Array.isArray(raw)
-    ? raw
-    : Array.isArray((raw as any)?.content)
-    ? (raw as any).content
-    : [];
+  const allBookings: Booking[] = useMemo(() => {
+    if (Array.isArray(raw)) {
+      return raw;
+    }
+    if (raw && typeof raw === 'object' && 'content' in raw && Array.isArray((raw as PagedResponse<Booking>).content)) {
+      return (raw as PagedResponse<Booking>).content;
+    }
+    return [];
+  }, [raw]);
 
   const filteredBookings = useMemo(() => {
     return allBookings.filter((bk: Booking) => {

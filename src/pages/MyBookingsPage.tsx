@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { 
   HiTicket, 
   HiCalendar, 
@@ -14,6 +15,7 @@ import {
   HiChevronRight
 } from 'react-icons/hi2';
 import { bookingService, type Booking } from '../services/bookingService';
+import type { PagedResponse } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
 import { getEventImage } from '../assets/images';
 
@@ -108,11 +110,13 @@ export default function MyBookingsPage() {
 
   const raw = data?.data;
   const allBookings: Booking[] = useMemo(() => {
-    return Array.isArray(raw)
-      ? raw
-      : Array.isArray((raw as any)?.content)
-      ? (raw as any).content
-      : [];
+    if (Array.isArray(raw)) {
+      return raw;
+    }
+    if (raw && typeof raw === 'object' && 'content' in raw && Array.isArray((raw as PagedResponse<Booking>).content)) {
+      return (raw as PagedResponse<Booking>).content;
+    }
+    return [];
   }, [raw]);
 
   // Filtering
@@ -218,7 +222,11 @@ export default function MyBookingsPage() {
             </div>
             <h3 style={{ color: '#be123c', fontWeight: 700, marginBottom: 6 }}>Failed to load bookings</h3>
             <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 16 }}>
-              {(error as any)?.response?.data?.message || (error as any)?.message || 'Please check backend server connection.'}
+              {axios.isAxiosError(error)
+                ? (error.response?.data?.message || error.message)
+                : error instanceof Error
+                ? error.message
+                : 'Please check backend server connection.'}
             </p>
             <button onClick={() => refetch()} className="btn btn-primary btn-sm">Try Again</button>
           </div>
