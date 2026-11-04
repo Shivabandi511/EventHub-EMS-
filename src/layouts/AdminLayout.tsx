@@ -37,37 +37,37 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     path === '/admin' ? location.pathname === '/admin' : location.pathname.startsWith(path);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: '#faf8ff' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg-midnight)' }}>
       {/* ── Sidebar ── */}
       <aside style={{
         width: 250, flexShrink: 0,
-        background: '#ffffff',
-        borderRight: '1px solid #ede9fe',
+        background: 'var(--bg-deep-navy)',
+        borderRight: '1px solid var(--border-subtle)',
         display: 'flex', flexDirection: 'column',
         position: 'sticky', top: 0, height: '100vh',
         overflowY: 'auto',
       }}>
         {/* Logo */}
-        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid #ede9fe' }}>
+        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid var(--border-subtle)' }}>
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
-              background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
+              background: 'linear-gradient(135deg, #10b981, #0d9488)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18, color: '#ffffff',
-              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+              boxShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
             }}>
               <HiBolt />
             </div>
-            <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 19, color: '#1e1b4b' }}>
+            <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 19, color: '#f8fafc' }}>
               Event<span className="gradient-text">Hub</span>
             </span>
           </Link>
           <div style={{
-            marginTop: 10, padding: '4px 8px', borderRadius: 6,
-            background: '#f3e8ff', border: '1px solid #e9d5ff', display: 'inline-block',
+            marginTop: 10, padding: '4px 10px', borderRadius: 6,
+            background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)', display: 'inline-block',
           }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', letterSpacing: '0.5px' }}>ADMIN CONSOLE</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#34d399', letterSpacing: '0.5px' }}>ADMIN CONSOLE</span>
           </div>
         </div>
 
@@ -80,19 +80,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </Link>
           ))}
 
-          <div style={{ borderTop: '1px solid #ede9fe', margin: '14px 0 8px' }} />
+          <div style={{ borderTop: '1px solid var(--border-subtle)', margin: '14px 0 8px' }} />
 
-          <Link to="/" className="sidebar-link" style={{ color: '#6b7280' }}>
+          <Link to="/" className="sidebar-link" style={{ color: '#94a3b8' }}>
             <HiArrowTopRightOnSquare style={{ fontSize: 18 }} />
             <span>Customer View</span>
           </Link>
         </nav>
 
         {/* User info + logout */}
-        <div style={{ padding: '16px 14px', borderTop: '1px solid #ede9fe' }}>
-          <div style={{ padding: '12px 14px', borderRadius: 10, background: '#faf8ff', border: '1px solid #ede9fe', marginBottom: 12 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#1e1b4b' }}>{user?.name}</p>
-            <p style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{user?.email}</p>
+        <div style={{ padding: '16px 14px', borderTop: '1px solid var(--border-subtle)' }}>
+          <div style={{ padding: '12px 14px', borderRadius: 10, background: 'var(--bg-midnight)', border: '1px solid var(--border-subtle)', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>{user?.name}</p>
+            <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{user?.email}</p>
           </div>
           <button className="btn btn-secondary btn-sm" style={{ width: '100%' }} onClick={handleLogout}>
             <HiArrowRightOnRectangle style={{ fontSize: 16 }} />
@@ -107,22 +107,23 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <header style={{
           height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 32px',
-          borderBottom: '1px solid #ede9fe',
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid var(--border-subtle)',
+          background: 'rgba(11, 16, 32, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           position: 'sticky', top: 0, zIndex: 40,
         }}>
-          <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#1e1b4b' }}>
+          <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#f8fafc' }}>
             {sidebarLinks.find(l => isActive(l.to))?.label ?? 'Dashboard'}
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 600 }}>Welcome, {user?.name?.split(' ')[0]}</span>
+            <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>Welcome, {user?.name?.split(' ')[0]}</span>
             <div style={{
               width: 36, height: 36, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
+              background: 'linear-gradient(135deg, #10b981, #34d399)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 14, fontWeight: 700, color: 'white',
-              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
+              boxShadow: '0 0 12px rgba(16, 185, 129, 0.4)',
             }}>
               {user?.name?.charAt(0).toUpperCase()}
             </div>

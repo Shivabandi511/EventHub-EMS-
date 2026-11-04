@@ -80,7 +80,7 @@ export default function RegisterPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 65%), #faf8ff',
+      background: 'radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.20) 0%, transparent 65%), var(--bg-midnight)',
       padding: '24px 16px',
     }}>
       <div style={{ width: '100%', maxWidth: 440 }}>
@@ -88,25 +88,25 @@ export default function RegisterPage() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 16, margin: '0 auto 16px',
-            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
+            background: 'linear-gradient(135deg, #10b981, #0d9488)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, color: '#ffffff', boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
+            fontSize: 28, color: '#ffffff', boxShadow: '0 0 20px rgba(16,185,129,0.4)',
           }}>
             <HiTicket />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e1b4b', marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 6 }}>
             Create an account
           </h1>
-          <p style={{ fontSize: 14, color: '#6b7280' }}>Join EventHub and start exploring events</p>
+          <p style={{ fontSize: 14, color: '#94a3b8' }}>Join EventHub and start exploring events</p>
         </div>
 
         {/* Card */}
         <div className="glass-card" style={{ padding: 32 }}>
           {apiError && (
             <div style={{
-              background: '#fff1f2', border: '1px solid #fecdd3',
+              background: 'rgba(248, 113, 113, 0.15)', border: '1px solid rgba(248, 113, 113, 0.3)',
               borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-              fontSize: 13, color: '#be123c', display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 13, color: '#f87171', display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
               <span>{apiError}</span>
@@ -114,11 +114,11 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {field('reg-name', 'Full Name', 'text', 'John Doe', 'name', <HiUser style={{ fontSize: 14, color: '#7c3aed' }} />)}
-            {field('reg-email', 'Email Address', 'email', 'you@example.com', 'email', <HiEnvelope style={{ fontSize: 14, color: '#7c3aed' }} />)}
-            {field('reg-phone', 'Phone Number', 'tel', '9876543210 (optional)', 'phone', <HiPhone style={{ fontSize: 14, color: '#7c3aed' }} />)}
-            {field('reg-pass', 'Password', 'password', '•••••••• (min 6 chars)', 'password', <HiLockClosed style={{ fontSize: 14, color: '#7c3aed' }} />)}
-            {field('reg-cpass', 'Confirm Password', 'password', '••••••••', 'confirmPassword', <HiLockClosed style={{ fontSize: 14, color: '#7c3aed' }} />)}
+            {field('reg-name', 'Full Name', 'text', 'John Doe', 'name', <HiUser style={{ fontSize: 14, color: '#10b981' }} />)}
+            {field('reg-email', 'Email Address', 'email', 'you@example.com', 'email', <HiEnvelope style={{ fontSize: 14, color: '#10b981' }} />)}
+            {field('reg-phone', 'Phone Number', 'tel', '9876543210 (optional)', 'phone', <HiPhone style={{ fontSize: 14, color: '#10b981' }} />)}
+            {field('reg-pass', 'Password', 'password', '•••••••• (min 6 chars)', 'password', <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />)}
+            {field('reg-cpass', 'Confirm Password', 'password', '••••••••', 'confirmPassword', <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />)}
 
             <button id="btn-register" type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
               {loading ? (
@@ -131,9 +131,9 @@ export default function RegisterPage() {
 
           <div className="divider" />
 
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280' }}>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#7c3aed', fontWeight: 600, textDecoration: 'none' }}>
+            <Link to="/login" style={{ color: '#34d399', fontWeight: 600, textDecoration: 'none' }}>
               Sign in
             </Link>
           </p>

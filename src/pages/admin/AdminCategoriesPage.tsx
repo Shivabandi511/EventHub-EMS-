@@ -46,11 +46,11 @@ export default function AdminCategoriesPage() {
       <div className="page-container" style={{ maxWidth: 840, padding: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <HiTag style={{ color: '#7c3aed' }} />
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiTag style={{ color: '#10b981' }} />
               <span>Event Categories</span>
             </h1>
-            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>{categories.length} categories available</p>
+            <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 4 }}>{categories.length} categories available</p>
           </div>
           <button id="btn-create-category" className="btn btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <HiPlus />
@@ -68,7 +68,7 @@ export default function AdminCategoriesPage() {
               <div style={{ fontSize: 48, color: '#94a3b8', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
                 <HiTag />
               </div>
-              <p style={{ color: '#64748b' }}>No categories created yet.</p>
+              <p style={{ color: '#94a3b8' }}>No categories created yet.</p>
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
@@ -83,9 +83,9 @@ export default function AdminCategoriesPage() {
                 <tbody>
                   {categories.map((cat, idx) => (
                     <tr key={cat.id}>
-                      <td style={{ color: '#64748b', fontWeight: 600 }}>{idx + 1}</td>
-                      <td style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{cat.name}</td>
-                      <td style={{ fontSize: 13, color: '#475569' }}>{cat.description ?? '—'}</td>
+                      <td style={{ color: '#94a3b8', fontWeight: 600 }}>{idx + 1}</td>
+                      <td style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>{cat.name}</td>
+                      <td style={{ fontSize: 13, color: '#94a3b8' }}>{cat.description ?? '—'}</td>
                       <td>
                         <span className={`badge ${cat.status === 'INACTIVE' ? 'badge-red' : 'badge-green'}`}>
                           {cat.status ?? 'Active'}
@@ -116,8 +116,8 @@ export default function AdminCategoriesPage() {
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div className="modal-box" style={{ maxWidth: 460 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
-                {editItem ? <><HiPencilSquare style={{ color: '#7c3aed' }} /> Edit Category</> : <><HiPlus style={{ color: '#7c3aed' }} /> Add Category</>}
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+                {editItem ? <><HiPencilSquare style={{ color: '#10b981' }} /> Edit Category</> : <><HiPlus style={{ color: '#10b981' }} /> Add Category</>}
               </h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
                 <HiXMark />
@@ -157,8 +157,8 @@ export default function AdminCategoriesPage() {
             <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
               <HiTrash />
             </div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Delete Category?</h3>
-            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 24 }}>This action cannot be undone.</p>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#f8fafc', marginBottom: 10 }}>Delete Category?</h3>
+            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(deleteConfirm!)}>
                 {deleteMutation.isPending ? 'Deleting…' : 'Yes, Delete'}

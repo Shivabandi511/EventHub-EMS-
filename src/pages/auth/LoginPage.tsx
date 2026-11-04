@@ -54,7 +54,7 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 65%), #faf8ff',
+      background: 'radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.20) 0%, transparent 65%), var(--bg-midnight)',
       padding: '24px 16px',
     }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
@@ -62,25 +62,25 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 16, margin: '0 auto 16px',
-            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
+            background: 'linear-gradient(135deg, #10b981, #0d9488)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, color: '#ffffff', boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
+            fontSize: 28, color: '#ffffff', boxShadow: '0 0 20px rgba(16,185,129,0.4)',
           }}>
             <HiBolt />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e1b4b', marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 6 }}>
             Welcome back
           </h1>
-          <p style={{ fontSize: 14, color: '#6b7280' }}>Sign in to your EventHub account</p>
+          <p style={{ fontSize: 14, color: '#94a3b8' }}>Sign in to your EventHub account</p>
         </div>
 
         {/* Card */}
         <div className="glass-card" style={{ padding: 32 }}>
           {apiError && (
             <div style={{
-              background: '#fff1f2', border: '1px solid #fecdd3',
+              background: 'rgba(248, 113, 113, 0.15)', border: '1px solid rgba(248, 113, 113, 0.3)',
               borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-              fontSize: 13, color: '#be123c', display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 13, color: '#f87171', display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
               <span>{apiError}</span>
@@ -91,7 +91,7 @@ export default function LoginPage() {
             {/* Email */}
             <div>
               <label className="label" htmlFor="login-email">
-                <HiEnvelope style={{ fontSize: 14, color: '#7c3aed' }} />
+                <HiEnvelope style={{ fontSize: 14, color: '#10b981' }} />
                 <span>Email address</span>
               </label>
               <input
@@ -105,7 +105,7 @@ export default function LoginPage() {
             {/* Password */}
             <div>
               <label className="label" htmlFor="login-password">
-                <HiLockClosed style={{ fontSize: 14, color: '#7c3aed' }} />
+                <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />
                 <span>Password</span>
               </label>
               <input
@@ -127,9 +127,9 @@ export default function LoginPage() {
 
           <div className="divider" />
 
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280' }}>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>
             Don't have an account?{' '}
-            <Link to="/register" style={{ color: '#7c3aed', fontWeight: 600, textDecoration: 'none' }}>
+            <Link to="/register" style={{ color: '#34d399', fontWeight: 600, textDecoration: 'none' }}>
               Create one
             </Link>
           </p>
@@ -138,12 +138,12 @@ export default function LoginPage() {
         {/* Demo hint */}
         <div style={{
           marginTop: 16, padding: '12px 16px', borderRadius: 10,
-          background: '#faf5ff', border: '1px solid #d8b4fe',
-          fontSize: 12, color: '#6d28d9', textAlign: 'center',
+          background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)',
+          fontSize: 12, color: '#34d399', textAlign: 'center',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         }}>
-          <HiLightBulb style={{ fontSize: 16, flexShrink: 0, color: '#d97706' }} />
-          <span>Demo: use <strong>admin@eventhub.com</strong> / <strong>admin123</strong> for admin access</span>
+          <HiLightBulb style={{ fontSize: 16, flexShrink: 0, color: '#34d399' }} />
+          <span>Demo: use <strong style={{ color: '#f8fafc' }}>admin@eventhub.com</strong> / <strong style={{ color: '#f8fafc' }}>admin123</strong> for admin access</span>
         </div>
       </div>
     </div>

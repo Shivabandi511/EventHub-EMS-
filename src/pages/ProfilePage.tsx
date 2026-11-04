@@ -49,7 +49,7 @@ export default function ProfilePage() {
   return (
     <CustomerLayout>
       <div className="container-app page-container" style={{ maxWidth: 620 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1e1b4b', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 800, color: '#f8fafc', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div className="booking-icon-box">
             <HiUser />
           </div>
@@ -60,17 +60,17 @@ export default function ProfilePage() {
         <div className="glass-card" style={{ padding: 28, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{
             width: 76, height: 76, borderRadius: '50%', flexShrink: 0,
-            background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
+            background: 'linear-gradient(135deg, #10b981, #34d399)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 30, fontWeight: 800, color: 'white',
-            boxShadow: '0 8px 24px rgba(124, 58, 237, 0.25)',
+            boxShadow: '0 8px 24px rgba(16, 185, 129, 0.4)',
           }}>
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e1b4b', marginBottom: 4 }}>{user?.name}</h2>
-            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <HiEnvelope style={{ color: '#7c3aed' }} />
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#f8fafc', marginBottom: 4 }}>{user?.name}</h2>
+            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <HiEnvelope style={{ color: '#22d3ee' }} />
               <span>{user?.email}</span>
             </p>
             <span className={`badge ${user?.role === 'ADMIN' ? 'badge-purple' : 'badge-green'}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -82,9 +82,9 @@ export default function ProfilePage() {
         {/* Success message */}
         {success && (
           <div style={{
-            background: '#ecfdf5', border: '1px solid #a7f3d0',
+            background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)',
             borderRadius: 12, padding: '12px 16px', marginBottom: 20,
-            fontSize: 13, color: '#065f46', display: 'flex', alignItems: 'center', gap: 8,
+            fontSize: 13, color: '#34d399', display: 'flex', alignItems: 'center', gap: 8,
           }}>
             <HiCheckCircle style={{ fontSize: 18 }} />
             <span>{success}</span>
@@ -94,7 +94,7 @@ export default function ProfilePage() {
         {/* Edit form */}
         <div className="glass-card" style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e1b4b' }}>Account Information</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#f8fafc' }}>Account Information</h3>
             {!editing && (
               <button id="btn-edit-profile" className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>
                 <HiPencilSquare style={{ fontSize: 14 }} />
@@ -107,7 +107,7 @@ export default function ProfilePage() {
             <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               <div>
                 <label className="label" htmlFor="profile-name">
-                  <HiUser style={{ fontSize: 14, color: '#7c3aed' }} />
+                  <HiUser style={{ fontSize: 14, color: '#10b981' }} />
                   <span>Full Name</span>
                 </label>
                 <input id="profile-name" className={`input${errors.name ? ' error' : ''}`}
@@ -117,7 +117,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="label" htmlFor="profile-phone">
-                  <HiPhone style={{ fontSize: 14, color: '#7c3aed' }} />
+                  <HiPhone style={{ fontSize: 14, color: '#10b981' }} />
                   <span>Phone Number</span>
                 </label>
                 <input id="profile-phone" type="tel" className={`input${errors.phone ? ' error' : ''}`}
@@ -128,14 +128,14 @@ export default function ProfilePage() {
 
               <div>
                 <label className="label">
-                  <HiEnvelope style={{ fontSize: 14, color: '#7c3aed' }} />
+                  <HiEnvelope style={{ fontSize: 14, color: '#10b981' }} />
                   <span>Email (read-only)</span>
                 </label>
-                <input className="input" value={user?.email} disabled style={{ opacity: 0.65, cursor: 'not-allowed', background: '#faf8ff' }} />
+                <input className="input" value={user?.email} disabled style={{ opacity: 0.65, cursor: 'not-allowed', background: 'var(--bg-midnight)' }} />
               </div>
 
               {mutation.isError && (
-                <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#be123c', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ background: 'rgba(244, 63, 94, 0.15)', border: '1px solid rgba(244, 63, 94, 0.35)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#f87171', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <HiExclamationTriangle style={{ fontSize: 18 }} />
                   <span>Failed to update profile. Please try again.</span>
                 </div>
@@ -151,16 +151,16 @@ export default function ProfilePage() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {[
-                { icon: <HiUser style={{ color: '#7c3aed' }} />, label: 'Full Name', value: user?.name },
-                { icon: <HiEnvelope style={{ color: '#7c3aed' }} />, label: 'Email Address', value: user?.email },
-                { icon: <HiPhone style={{ color: '#7c3aed' }} />, label: 'Phone Number',  value: user?.phone ?? 'Not provided' },
+                { icon: <HiUser style={{ color: '#10b981' }} />, label: 'Full Name', value: user?.name },
+                { icon: <HiEnvelope style={{ color: '#22d3ee' }} />, label: 'Email Address', value: user?.email },
+                { icon: <HiPhone style={{ color: '#34d399' }} />, label: 'Phone Number',  value: user?.phone ?? 'Not provided' },
               ].map(({ icon, label, value }) => (
-                <div key={label} style={{ borderBottom: '1px solid #ede9fe', paddingBottom: 14 }}>
-                  <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div key={label} style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: 14 }}>
+                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
                     {icon}
                     <span>{label}</span>
                   </p>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#1e1b4b' }}>{value}</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc' }}>{value}</p>
                 </div>
               ))}
             </div>

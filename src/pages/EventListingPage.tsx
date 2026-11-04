@@ -23,8 +23,8 @@ import CustomerLayout from '../layouts/CustomerLayout';
 import { getEventImage } from '../assets/images';
 
 const CATEGORY_ICON: Record<string, React.ReactElement> = {
-  Technology: <HiCpuChip style={{ color: '#7c3aed' }} />,
-  Tech: <HiCpuChip style={{ color: '#7c3aed' }} />,
+  Technology: <HiCpuChip style={{ color: '#10b981' }} />,
+  Tech: <HiCpuChip style={{ color: '#10b981' }} />,
   'Music & Concerts': <HiMusicalNote style={{ color: '#ec4899' }} />,
   Music: <HiMusicalNote style={{ color: '#ec4899' }} />,
   'Business & Startup': <HiBriefcase style={{ color: '#059669' }} />,
@@ -59,20 +59,20 @@ function EventCard({ event }: { event: Event }) {
       </div>
 
       <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e1b4b', marginBottom: 8, lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', marginBottom: 8, lineHeight: 1.3 }}>
           {event.title}
         </h3>
-        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <HiCalendar style={{ color: '#7c3aed', flexShrink: 0 }} />
+        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <HiCalendar style={{ color: '#34d399', flexShrink: 0 }} />
           <span>{date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
         </p>
-        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <HiMapPin style={{ color: '#e11d48', flexShrink: 0 }} />
+        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <HiMapPin style={{ color: '#22d3ee', flexShrink: 0 }} />
           <span>{event.venue?.name}, {event.venue?.city}</span>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 12, borderTop: '1px solid #f3f0ff' }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 12, borderTop: '1px solid rgba(16, 185, 129, 0.2)' }}>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#22d3ee' }}>
             {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
           </span>
           <button
@@ -149,21 +149,29 @@ export default function EventListingPage() {
       <div className="container-app page-container">
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1e1b4b', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <HiCalendar style={{ color: '#7c3aed' }} />
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#f8fafc', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <HiCalendar style={{ color: '#22d3ee' }} />
             <span>Discover Events</span>
           </h1>
-          <p style={{ color: '#6b7280', fontSize: 15 }}>
+          <p style={{ color: '#94a3b8', fontSize: 15 }}>
             {isLoading ? 'Loading events…' : `${totalItems} event${totalItems !== 1 ? 's' : ''} available`}
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '270px 1fr', gap: 28, alignItems: 'start' }}>
           {/* ── Filters Sidebar ── */}
-          <aside className="filter-card">
+          <aside
+            className="filter-card"
+            style={{
+              position: 'sticky',
+              top: 88,
+              maxHeight: 'calc(100vh - 108px)',
+              overflowY: 'auto',
+            }}
+          >
             <div className="filter-header">
               <h3 className="filter-title">
-                <HiAdjustmentsHorizontal style={{ color: '#7c3aed', fontSize: 20 }} />
+                <HiAdjustmentsHorizontal style={{ color: '#10b981', fontSize: 20 }} />
                 <span>Filters</span>
               </h3>
               {hasFilters && (
@@ -270,8 +278,8 @@ export default function EventListingPage() {
                 <div className="state-icon">
                   <HiMagnifyingGlass />
                 </div>
-                <h3 style={{ fontSize: 20, color: '#1e1b4b', marginBottom: 8 }}>No events matched your search</h3>
-                <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 20 }}>Try relaxing your filters or searching for something else.</p>
+                <h3 style={{ fontSize: 20, color: '#f8fafc', marginBottom: 8 }}>No events matched your search</h3>
+                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 20 }}>Try relaxing your filters or searching for something else.</p>
                 <button className="btn btn-secondary btn-sm" onClick={clearFilters}>Reset Filters</button>
               </div>
             ) : (

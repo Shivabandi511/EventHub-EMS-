@@ -4,7 +4,7 @@ EventHub is a modern, enterprise-grade Event Management and Ticketing Platform b
 
 ---
 
-## 🎨 Design & Theme Highlights
+## Design & Theme Highlights
 
 - **Palette**: Refined **Royal Violet** (`#7c3aed`, `#6d28d9`), **Emerald Green** (`#059669`), **Warm Amber** (`#d97706`), and **Rose** (`#e11d48`).
 - **No Blue Policy**: Pure luxury violet and emerald styling across all customer and admin screens.
@@ -14,7 +14,7 @@ EventHub is a modern, enterprise-grade Event Management and Ticketing Platform b
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
 ### 👤 Customer Experience
 1. **Interactive Event Discovery**:
@@ -108,7 +108,7 @@ frontend/
 
 ---
 
-## 🛠️ Setup & Running
+##  Setup & Running
 
 ### 1. Prerequisites
 - **Node.js**: v18.0.0 or higher
@@ -133,7 +133,7 @@ npm run build
 
 ---
 
-## 🔑 Demo Credentials
+##  Demo Credentials
 
 | Role | Email | Password |
 |---|---|---|

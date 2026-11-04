@@ -132,11 +132,11 @@ export default function AdminEventsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <HiCalendarDays style={{ color: '#7c3aed' }} />
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiCalendarDays style={{ color: '#10b981' }} />
               <span>Event Management</span>
             </h1>
-            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
+            <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 4 }}>
               {rawEvents.length} total events organized in platform
             </p>
           </div>
@@ -195,7 +195,7 @@ export default function AdminEventsPage() {
               <div style={{ fontSize: 48, color: '#94a3b8', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
                 <HiTicket />
               </div>
-              <p style={{ color: '#64748b', fontWeight: 500 }}>No events found matching your criteria.</p>
+              <p style={{ color: '#94a3b8', fontWeight: 500 }}>No events found matching your criteria.</p>
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
@@ -211,23 +211,23 @@ export default function AdminEventsPage() {
                   {pagedEvents.map((ev: Event) => (
                     <tr key={ev.id}>
                       <td>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>{ev.title}</p>
-                        <p style={{ fontSize: 12, color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <HiMapPin style={{ color: '#e11d48' }} />
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', marginBottom: 2 }}>{ev.title}</p>
+                        <p style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <HiMapPin style={{ color: '#22d3ee' }} />
                           <span>{ev.venue?.name}, {ev.venue?.city}</span>
                         </p>
                       </td>
                       <td>
                         <span className="badge badge-purple">{ev.category?.name}</span>
                       </td>
-                      <td style={{ fontSize: 13, color: '#475569' }}>
+                      <td style={{ fontSize: 13, color: '#94a3b8' }}>
                         {new Date(ev.dateTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>
+                      <td style={{ fontSize: 14, fontWeight: 800, color: '#22d3ee' }}>
                         {ev.price === 0 ? 'Free' : `₹${ev.price?.toLocaleString('en-IN')}`}
                       </td>
-                      <td style={{ fontSize: 13, color: '#475569' }}>
-                        <span style={{ fontWeight: 700, color: ev.availableSeats > 0 ? '#059669' : '#e11d48' }}>
+                      <td style={{ fontSize: 13, color: '#94a3b8' }}>
+                        <span style={{ fontWeight: 700, color: ev.availableSeats > 0 ? '#34d399' : '#f87171' }}>
                           {ev.availableSeats}
                         </span> / {ev.totalSeats} seats
                       </td>
@@ -265,7 +265,7 @@ export default function AdminEventsPage() {
             >
               <HiChevronLeft /> Prev
             </button>
-            <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600, padding: '0 8px' }}>
+            <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600, padding: '0 8px' }}>
               Page {page + 1} of {totalPages}
             </span>
             <button
@@ -284,8 +284,8 @@ export default function AdminEventsPage() {
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div className="modal-box" style={{ maxWidth: 620 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
-                {editEvent ? <><HiPencilSquare style={{ color: '#7c3aed' }} /> Edit Event</> : <><HiPlus style={{ color: '#7c3aed' }} /> Create Event</>}
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+                {editEvent ? <><HiPencilSquare style={{ color: '#10b981' }} /> Edit Event</> : <><HiPlus style={{ color: '#10b981' }} /> Create Event</>}
               </h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
                 <HiXMark />
@@ -383,8 +383,8 @@ export default function AdminEventsPage() {
             <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
               <HiTrash />
             </div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Delete Event?</h3>
-            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 24 }}>This action cannot be undone.</p>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#f8fafc', marginBottom: 10 }}>Delete Event?</h3>
+            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending}
                 onClick={() => deleteMutation.mutate(deleteConfirm!)}>

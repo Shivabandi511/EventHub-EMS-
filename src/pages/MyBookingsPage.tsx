@@ -43,21 +43,21 @@ function BookingCard({ booking }: { booking: Booking }) {
       {/* Event Thumb / Icon */}
       <div style={{ width: 84, height: 84, borderRadius: 14, overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
         <img src={eventImg} alt={booking.event?.title ?? 'Event'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(124, 58, 237, 0.15)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(16, 185, 129, 0.15)' }} />
       </div>
 
       {/* Info Body */}
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
-          <h3 style={{ fontSize: 17, fontWeight: 700, color: '#1e1b4b' }}>
+          <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f8fafc' }}>
             {booking.event?.title ?? 'Event Booking'}
           </h3>
           <span className={`badge ${s.cls}`}>{s.label}</span>
         </div>
 
         {eventDate && !isNaN(eventDate.getTime()) && (
-          <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <HiCalendar style={{ color: '#7c3aed', flexShrink: 0 }} />
+          <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <HiCalendar style={{ color: '#34d399', flexShrink: 0 }} />
             <span>
               {eventDate.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })} · {eventDate.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}
             </span>
@@ -65,19 +65,19 @@ function BookingCard({ booking }: { booking: Booking }) {
         )}
 
         {booking.event?.venue && (
-          <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <HiMapPin style={{ color: '#e11d48', flexShrink: 0 }} />
+          <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <HiMapPin style={{ color: '#22d3ee', flexShrink: 0 }} />
             <span>{booking.event.venue.name}{booking.event.venue.city ? `, ${booking.event.venue.city}` : ''}</span>
           </p>
         )}
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <span style={{ fontSize: 13, color: '#4b5563', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <HiTicket style={{ color: '#a855f7' }} />
+            <span style={{ fontSize: 13, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <HiTicket style={{ color: '#34d399' }} />
               {booking.ticketCount} ticket{booking.ticketCount > 1 ? 's' : ''}
             </span>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#059669' }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: '#34d399' }}>
               {booking.totalAmount === 0 ? 'Free' : `₹${booking.totalAmount?.toLocaleString('en-IN')}`}
             </span>
           </div>
@@ -88,8 +88,8 @@ function BookingCard({ booking }: { booking: Booking }) {
           </Link>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid #f3f0ff', fontSize: 11, color: '#6b7280' }}>
-          <span>Ref: <strong style={{ color: '#7c3aed' }}>#EH{String(booking.id).padStart(6, '0')}</strong></span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border-subtle)', fontSize: 11, color: '#94a3b8' }}>
+          <span>Ref: <strong style={{ color: '#34d399' }}>#EH{String(booking.id).padStart(6, '0')}</strong></span>
           <span>Booked on {!isNaN(bookDate.getTime()) ? bookDate.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : 'Recently'}</span>
         </div>
       </div>

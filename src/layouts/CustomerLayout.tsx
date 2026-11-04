@@ -42,28 +42,29 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#faf8ff' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-midnight)' }}>
       {/* ── Navbar ── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 50,
-        background: 'rgba(255, 255, 255, 0.92)',
+        background: 'rgba(6, 18, 14, 0.85)',
         backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid #ede9fe',
-        boxShadow: '0 1px 3px rgba(30, 27, 75, 0.04)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid var(--border-subtle)',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
       }}>
         <div className="container-app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 68 }}>
           {/* Logo */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
               width: 38, height: 38, borderRadius: 12,
-              background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
+              background: 'linear-gradient(135deg, #10b981, #0d9488)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 20, color: '#ffffff',
-              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+              boxShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
             }}>
               <HiBolt />
             </div>
-            <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 21, color: '#1e1b4b' }}>
+            <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 21, color: '#f8fafc' }}>
               Event<span className="gradient-text">Hub</span>
             </span>
           </Link>
@@ -89,14 +90,14 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 <Link to="/profile" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{
                     width: 34, height: 34, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
+                    background: 'linear-gradient(135deg, #10b981, #34d399)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 14, fontWeight: 700, color: '#ffffff',
-                    boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
+                    boxShadow: '0 0 12px rgba(16, 185, 129, 0.4)',
                   }}>
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <span style={{ fontSize: 13, color: '#4b5563', fontWeight: 600 }} className="hidden-mobile">
+                  <span style={{ fontSize: 13, color: '#f8fafc', fontWeight: 600 }} className="hidden-mobile">
                     {user?.name?.split(' ')[0]}
                   </span>
                 </Link>
@@ -121,7 +122,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
             {/* Mobile menu button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', padding: 6, fontSize: 22 }}
+              style={{ background: 'none', border: 'none', color: '#f8fafc', cursor: 'pointer', padding: 6, fontSize: 22 }}
               className="show-mobile"
               aria-label="Toggle Navigation"
             >
@@ -132,7 +133,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
         {/* Mobile dropdown */}
         {menuOpen && (
-          <div style={{ borderTop: '1px solid #ede9fe', background: '#ffffff', padding: '12px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-deep-navy)', padding: '12px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
             {navLinks.map(({ to, label, icon }) => (
               <Link
                 key={to}
@@ -156,14 +157,14 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
       {/* ── Footer ── */}
       <footer style={{
-        borderTop: '1px solid #ede9fe',
-        background: '#ffffff',
+        borderTop: '1px solid var(--border-subtle)',
+        background: 'var(--bg-midnight)',
         padding: '36px 24px',
         textAlign: 'center',
       }}>
         <div className="container-app">
-          <p style={{ fontSize: 14, color: '#6b7280' }}>
-            © 2026 <span style={{ color: '#7c3aed', fontWeight: 700 }}>EventHub</span> — Modern Event Management &amp; Ticketing Platform
+          <p style={{ fontSize: 14, color: '#94a3b8' }}>
+            © 2026 <span style={{ color: '#34d399', fontWeight: 700 }}>EventHub</span> — Modern Event Management &amp; Ticketing Platform
           </p>
         </div>
       </footer>
