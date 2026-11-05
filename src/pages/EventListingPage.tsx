@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -6,7 +6,6 @@ import {
   HiMapPin, 
   HiTicket, 
   HiArrowRight, 
-  HiAdjustmentsHorizontal, 
   HiMagnifyingGlass, 
   HiExclamationTriangle, 
   HiChevronLeft, 
@@ -16,11 +15,12 @@ import {
   HiMusicalNote,
   HiBriefcase,
   HiTrophy,
-  HiPaintBrush
+  HiPaintBrush,
+  HiGlobeAmericas
 } from 'react-icons/hi2';
-import { eventService, categoryService, type Event, type Category } from '../services/eventService';
+import { eventService, type Event } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
-import { getEventImage } from '../assets/images';
+import { getEventImage, getCategoryFallback } from '../assets/images';
 
 const CATEGORY_ICON: Record<string, React.ReactElement> = {
   Technology: <HiCpuChip style={{ color: '#10b981' }} />,
@@ -35,44 +35,62 @@ const CATEGORY_ICON: Record<string, React.ReactElement> = {
   Art: <HiPaintBrush style={{ color: '#db2777' }} />,
 };
 
+const CITY_TABS = [
+  { id: '',          name: 'All Locations', short: 'ALL', icon: <HiGlobeAmericas /> },
+  { id: 'Hyderabad', name: 'Hyderabad',     short: 'HYD', icon: <HiMapPin /> },
+  { id: 'Bangalore', name: 'Bengaluru',     short: 'BLR', icon: <HiMapPin /> },
+  { id: 'Mumbai',    name: 'Mumbai',        short: 'BOM', icon: <HiMapPin /> },
+  { id: 'New Delhi', name: 'New Delhi',     short: 'DEL', icon: <HiMapPin /> },
+];
+
 function EventCard({ event }: { event: Event }) {
   const navigate = useNavigate();
   const date = new Date(event.dateTime);
   const isSoldOut = event.availableSeats === 0;
-  const eventImg = getEventImage(event.imageUrl, event.category?.name);
+  const [imgSrc, setImgSrc] = useState(getEventImage(event.imageUrl, event.category?.name));
+
+  useEffect(() => {
+    setImgSrc(getEventImage(event.imageUrl, event.category?.name));
+  }, [event.imageUrl, event.category?.name]);
 
   return (
     <div className="event-card" onClick={() => navigate(`/events/${event.id}`)} style={{ cursor: 'pointer' }}>
       <div className="event-card-img-wrap">
-        <img src={eventImg} alt={event.title} />
-        <div style={{ position: 'absolute', top: 10, right: 10 }}>
+        <img
+          src={imgSrc}
+          alt={event.title}
+          onError={() => setImgSrc(getCategoryFallback(event.category?.name))}
+        />
+        <div style={{ position: 'absolute', top: 12, right: 12 }}>
           <span className={`badge ${isSoldOut ? 'badge-rose' : 'badge-green'}`}>
             {isSoldOut ? 'Sold Out' : `${event.availableSeats} left`}
           </span>
         </div>
-        <div style={{ position: 'absolute', top: 10, left: 10 }}>
-          <span className="badge badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ position: 'absolute', top: 12, left: 12 }}>
+          <span className="badge badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             {CATEGORY_ICON[event.category?.name ?? '']}
             <span>{event.category?.name ?? 'Event'}</span>
           </span>
         </div>
       </div>
 
-      <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', marginBottom: 8, lineHeight: 1.3 }}>
+      <div style={{ padding: '18px 20px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f8fafc', marginBottom: 8, lineHeight: 1.3 }}>
           {event.title}
         </h3>
-        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 6 }}>
           <HiCalendar style={{ color: '#34d399', flexShrink: 0 }} />
-          <span>{date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+          <span>
+            {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+          </span>
         </p>
         <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
           <HiMapPin style={{ color: '#22d3ee', flexShrink: 0 }} />
           <span>{event.venue?.name}, {event.venue?.city}</span>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 12, borderTop: '1px solid rgba(16, 185, 129, 0.2)' }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#22d3ee' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 14, borderTop: '1px solid rgba(16, 185, 129, 0.2)' }}>
+          <span style={{ fontSize: 19, fontWeight: 800, color: '#34d399' }}>
             {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
           </span>
           <button
@@ -92,27 +110,17 @@ function EventCard({ event }: { event: Event }) {
 
 export default function EventListingPage() {
   const [searchParams] = useSearchParams();
-  const [filters, setFilters] = useState({
-    search:     searchParams.get('search')     ?? '',
-    categoryId: searchParams.get('categoryId') ?? '',
-    city:       searchParams.get('city')       ?? '',
-    fromDate:   searchParams.get('fromDate')   ?? '',
-    toDate:     searchParams.get('toDate')     ?? '',
-    minPrice:   searchParams.get('minPrice')   ?? '',
-    maxPrice:   searchParams.get('maxPrice')   ?? '',
-    sort:       searchParams.get('sort')       ?? 'dateTime',
-  });
+  const [search, setSearch] = useState(searchParams.get('search') ?? '');
+  const [selectedCity, setSelectedCity] = useState(searchParams.get('city') ?? '');
+  const [sort, setSort] = useState(searchParams.get('sort') ?? 'dateTime');
   const [page, setPage] = useState(0);
 
   const queryParams = {
-    ...(filters.search     && { search:     filters.search }),
-    ...(filters.categoryId && { categoryId: Number(filters.categoryId) }),
-    ...(filters.city       && { city:       filters.city }),
-    ...(filters.fromDate   && { fromDate:   filters.fromDate }),
-    ...(filters.toDate     && { toDate:     filters.toDate }),
-    ...(filters.minPrice   && { minPrice:   Number(filters.minPrice) }),
-    ...(filters.maxPrice   && { maxPrice:   Number(filters.maxPrice) }),
-    sort: filters.sort, page, size: 9,
+    ...(search && { search }),
+    ...(selectedCity && { city: selectedCity }),
+    sort,
+    page,
+    size: 6, // 6 events per page ensures multi-page pagination across our 18 events
   };
 
   const { data, isLoading, isError } = useQuery({
@@ -121,210 +129,216 @@ export default function EventListingPage() {
     retry: false,
   });
 
-  const { data: catsData } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoryService.getAll(),
-    retry: false,
-  });
-
-  const events     = data?.data?.content    ?? [];
-  const totalPages = data?.data?.totalPages ?? 0;
+  const events     = data?.data?.content       ?? [];
+  const totalPages = data?.data?.totalPages    ?? 0;
   const totalItems = data?.data?.totalElements ?? 0;
-  const categories = catsData?.data ?? [];
 
-  const applyFilter = (key: string, value: string) => {
-    setFilters(p => ({ ...p, [key]: value }));
-    setPage(0);
-  };
-
-  const clearFilters = () => {
-    setFilters({ search: '', categoryId: '', city: '', fromDate: '', toDate: '', minPrice: '', maxPrice: '', sort: 'dateTime' });
-    setPage(0);
-  };
-
-  const hasFilters = Object.values(filters).some(v => v && v !== 'dateTime');
+  // Scroll to top smoothly when navigating pages
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
 
   return (
     <CustomerLayout>
-      <div className="container-app page-container">
-        {/* Header */}
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#f8fafc', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <HiCalendar style={{ color: '#22d3ee' }} />
-            <span>Discover Events</span>
-          </h1>
-          <p style={{ color: '#94a3b8', fontSize: 15 }}>
-            {isLoading ? 'Loading events…' : `${totalItems} event${totalItems !== 1 ? 's' : ''} available`}
-          </p>
-        </div>
+      <div className="container-app page-container" style={{ maxWidth: 1240 }}>
+        {/* Header Bar */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 24,
+          flexWrap: 'wrap',
+          gap: 16
+        }}>
+          <div>
+            <h1 style={{ fontSize: 'clamp(26px, 4vw, 34px)', fontWeight: 800, color: '#f8fafc', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiCalendar style={{ color: '#22d3ee' }} />
+              <span>Discover Events</span>
+            </h1>
+            <p style={{ color: '#94a3b8', fontSize: 15 }}>
+              {isLoading
+                ? 'Loading events…'
+                : selectedCity
+                  ? `Showing ${events.length} of ${totalItems} events in ${selectedCity === 'Bangalore' ? 'Bengaluru' : selectedCity} (Page ${page + 1} of ${Math.max(1, totalPages)})`
+                  : `Showing ${events.length} of ${totalItems} events across all locations (Page ${page + 1} of ${Math.max(1, totalPages)})`}
+            </p>
+          </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '270px 1fr', gap: 28, alignItems: 'start' }}>
-          {/* ── Filters Sidebar ── */}
-          <aside
-            className="filter-card"
-            style={{
-              position: 'sticky',
-              top: 88,
-              maxHeight: 'calc(100vh - 108px)',
-              overflowY: 'auto',
-            }}
-          >
-            <div className="filter-header">
-              <h3 className="filter-title">
-                <HiAdjustmentsHorizontal style={{ color: '#10b981', fontSize: 20 }} />
-                <span>Filters</span>
-              </h3>
-              {hasFilters && (
-                <button onClick={clearFilters} style={{ fontSize: 12, color: '#e11d48', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+          {/* Quick Search & Sort Controls */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', minWidth: 230 }}>
+              <input
+                id="search-events"
+                type="text"
+                className="input"
+                placeholder="Search events…"
+                value={search}
+                onChange={e => { setSearch(e.target.value); setPage(0); }}
+                style={{ paddingLeft: 38, fontSize: 13, height: 42 }}
+              />
+              <HiMagnifyingGlass style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: 16 }} />
+              {search && (
+                <button
+                  onClick={() => { setSearch(''); setPage(0); }}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 14 }}
+                  aria-label="Clear search"
+                >
                   <HiXMark />
-                  <span>Clear all</span>
                 </button>
               )}
             </div>
 
-            {/* Search */}
-            <div style={{ marginBottom: 16 }}>
-              <label className="label">Search Events</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  id="filter-search" className="input" placeholder="Search keywords…"
-                  value={filters.search}
-                  onChange={e => applyFilter('search', e.target.value)}
-                  style={{ fontSize: 13, paddingLeft: 36 }}
-                />
-                <HiMagnifyingGlass style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: 16 }} />
-              </div>
-            </div>
-
-            {/* Category */}
-            {categories.length > 0 && (
-              <div style={{ marginBottom: 16 }}>
-                <label className="label">Category</label>
-                <select
-                  id="filter-category" className="input"
-                  value={filters.categoryId}
-                  onChange={e => applyFilter('categoryId', e.target.value)}
-                  style={{ fontSize: 13 }}
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((c: Category) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {/* City */}
-            <div style={{ marginBottom: 16 }}>
-              <label className="label">City / Location</label>
-              <input
-                id="filter-city" className="input" placeholder="e.g. Hyderabad, Bangalore"
-                value={filters.city}
-                onChange={e => applyFilter('city', e.target.value)}
-                style={{ fontSize: 13 }}
-              />
-            </div>
-
-            {/* Date range */}
-            <div style={{ marginBottom: 16 }}>
-              <label className="label">From Date</label>
-              <input id="filter-from" className="input" type="date" value={filters.fromDate} onChange={e => applyFilter('fromDate', e.target.value)} style={{ fontSize: 13 }} />
-            </div>
-            <div style={{ marginBottom: 16 }}>
-              <label className="label">To Date</label>
-              <input id="filter-to" className="input" type="date" value={filters.toDate} onChange={e => applyFilter('toDate', e.target.value)} style={{ fontSize: 13 }} />
-            </div>
-
-            {/* Price */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
-              <div>
-                <label className="label">Min (₹)</label>
-                <input id="filter-minprice" className="input" type="number" min="0" placeholder="0" value={filters.minPrice} onChange={e => applyFilter('minPrice', e.target.value)} style={{ fontSize: 13 }} />
-              </div>
-              <div>
-                <label className="label">Max (₹)</label>
-                <input id="filter-maxprice" className="input" type="number" min="0" placeholder="Max" value={filters.maxPrice} onChange={e => applyFilter('maxPrice', e.target.value)} style={{ fontSize: 13 }} />
-              </div>
-            </div>
-
-            {/* Sort */}
-            <div>
-              <label className="label">Sort By</label>
-              <select id="filter-sort" className="input" value={filters.sort} onChange={e => applyFilter('sort', e.target.value)} style={{ fontSize: 13 }}>
-                <option value="dateTime">Date (Earliest First)</option>
-                <option value="price">Price (Low to High)</option>
-                <option value="price,desc">Price (High to Low)</option>
-                <option value="title">Title (A → Z)</option>
-              </select>
-            </div>
-          </aside>
-
-          {/* ── Events Grid ── */}
-          <div>
-            {isLoading ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-                <div className="spinner" style={{ width: 44, height: 44 }} />
-              </div>
-            ) : isError ? (
-              <div className="state-box" style={{ background: '#fff1f2', borderColor: '#fecdd3' }}>
-                <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-                  <HiExclamationTriangle />
-                </div>
-                <h3 style={{ color: '#be123c', fontWeight: 700, marginBottom: 8 }}>Failed to load events</h3>
-                <p style={{ fontSize: 14, color: '#6b7280' }}>Please verify the backend connection.</p>
-              </div>
-            ) : events.length === 0 ? (
-              <div className="state-box">
-                <div className="state-icon">
-                  <HiMagnifyingGlass />
-                </div>
-                <h3 style={{ fontSize: 20, color: '#f8fafc', marginBottom: 8 }}>No events matched your search</h3>
-                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 20 }}>Try relaxing your filters or searching for something else.</p>
-                <button className="btn btn-secondary btn-sm" onClick={clearFilters}>Reset Filters</button>
-              </div>
-            ) : (
-              <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 22 }}>
-                  {events.map(event => <EventCard key={event.id} event={event} />)}
-                </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="pagination-container">
-                    <button
-                      className="pagination-btn"
-                      disabled={page === 0}
-                      onClick={() => setPage(p => p - 1)}
-                    >
-                      <HiChevronLeft />
-                      <span>Prev</span>
-                    </button>
-
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i}
-                        className={`pagination-btn ${page === i ? 'active' : ''}`}
-                        onClick={() => setPage(i)}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-
-                    <button
-                      className="pagination-btn"
-                      disabled={page >= totalPages - 1}
-                      onClick={() => setPage(p => p + 1)}
-                    >
-                      <span>Next</span>
-                      <HiChevronRight />
-                    </button>
-
-                    <span className="pagination-info">Page {page + 1} of {totalPages}</span>
-                  </div>
-                )}
-              </>
-            )}
+            <select
+              id="sort-events"
+              className="input"
+              value={sort}
+              onChange={e => { setSort(e.target.value); setPage(0); }}
+              style={{ fontSize: 13, width: 'auto', minWidth: 175, height: 42 }}
+            >
+              <option value="dateTime">Date (Earliest First)</option>
+              <option value="price">Price (Low to High)</option>
+              <option value="price,desc">Price (High to Low)</option>
+              <option value="title">Title (A → Z)</option>
+            </select>
           </div>
+        </div>
+
+        {/* ── City / State Filter Tabs ── */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          marginBottom: 32,
+          overflowX: 'auto',
+          paddingBottom: 6,
+          WebkitOverflowScrolling: 'touch',
+        }}>
+          {CITY_TABS.map(city => {
+            const isSelected = selectedCity === city.id;
+            return (
+              <button
+                key={city.id}
+                onClick={() => { setSelectedCity(city.id); setPage(0); }}
+                className="filter-chip"
+                style={{
+                  padding: '9px 18px',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  borderRadius: 999,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  background: isSelected ? 'linear-gradient(135deg, #10B981 0%, #0D9488 100%)' : 'rgba(13, 30, 24, 0.85)',
+                  color: isSelected ? '#ffffff' : '#94a3b8',
+                  border: isSelected ? '1px solid #10B981' : '1px solid var(--border-subtle)',
+                  boxShadow: isSelected ? '0 4px 16px rgba(16, 185, 129, 0.4)' : 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <span>{city.icon}</span>
+                <span>{city.name}</span>
+                {city.id ? (
+                  <span style={{
+                    fontSize: 11,
+                    padding: '2px 7px',
+                    borderRadius: 999,
+                    background: isSelected ? 'rgba(255,255,255,0.22)' : 'rgba(16, 185, 129, 0.15)',
+                    color: isSelected ? '#ffffff' : '#34d399',
+                    fontWeight: 800
+                  }}>
+                    {city.short}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── All Events Grid (Full Width) ── */}
+        <div>
+          {isLoading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+              <div className="spinner" style={{ width: 44, height: 44 }} />
+            </div>
+          ) : isError ? (
+            <div className="state-box" style={{ background: 'rgba(248, 113, 113, 0.1)', borderColor: 'rgba(248, 113, 113, 0.3)' }}>
+              <div style={{ fontSize: 44, color: '#f87171', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+                <HiExclamationTriangle />
+              </div>
+              <h3 style={{ color: '#f87171', fontWeight: 700, marginBottom: 8 }}>Failed to load events</h3>
+              <p style={{ fontSize: 14, color: '#94a3b8' }}>Please verify the backend connection.</p>
+            </div>
+          ) : events.length === 0 ? (
+            <div className="state-box">
+              <div className="state-icon">
+                <HiMapPin />
+              </div>
+              <h3 style={{ fontSize: 20, color: '#f8fafc', marginBottom: 8 }}>
+                No events found {selectedCity ? `in ${selectedCity}` : ''}
+              </h3>
+              <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 20 }}>
+                Try selecting "All Locations" or search with a different keyword.
+              </p>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => { setSelectedCity(''); setSearch(''); setPage(0); }}
+              >
+                View All Events
+              </button>
+            </div>
+          ) : (
+            <>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
+                gap: 26,
+              }}>
+                {events.map(event => <EventCard key={event.id} event={event} />)}
+              </div>
+
+              {/* ── Pagination Bar ── */}
+              {totalPages > 1 && (
+                <div className="pagination-container" style={{ marginTop: 48, justifyContent: 'center' }}>
+                  <button
+                    className="pagination-btn"
+                    disabled={page === 0}
+                    onClick={() => setPage(p => p - 1)}
+                    aria-label="Previous page"
+                  >
+                    <HiChevronLeft />
+                    <span>Prev</span>
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      className={`pagination-btn ${page === i ? 'active' : ''}`}
+                      onClick={() => setPage(i)}
+                      style={{ minWidth: 40, height: 40, fontWeight: 700 }}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    className="pagination-btn"
+                    disabled={page >= totalPages - 1}
+                    onClick={() => setPage(p => p + 1)}
+                    aria-label="Next page"
+                  >
+                    <span>Next</span>
+                    <HiChevronRight />
+                  </button>
+
+                  <span className="pagination-info" style={{ marginLeft: 8 }}>
+                    Page {page + 1} of {totalPages} ({totalItems} total)
+                  </span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </CustomerLayout>

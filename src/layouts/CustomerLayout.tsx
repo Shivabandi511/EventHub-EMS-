@@ -101,13 +101,13 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                     {user?.name?.split(' ')[0]}
                   </span>
                 </Link>
-                <button className="btn btn-secondary btn-sm" onClick={handleLogout}>
+                <button className="btn btn-secondary btn-sm hidden-mobile" onClick={handleLogout}>
                   <HiArrowRightOnRectangle style={{ fontSize: 15 }} />
-                  <span className="hidden-mobile">Logout</span>
+                  <span>Logout</span>
                 </button>
               </>
             ) : (
-              <>
+              <div className="hidden-mobile" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Link to="/login" className="btn btn-secondary btn-sm">
                   <HiArrowRightEndOnRectangle style={{ fontSize: 15 }} />
                   <span>Login</span>
@@ -116,13 +116,13 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                   <HiUserPlus style={{ fontSize: 15 }} />
                   <span>Sign Up</span>
                 </Link>
-              </>
+              </div>
             )}
 
             {/* Mobile menu button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              style={{ background: 'none', border: 'none', color: '#f8fafc', cursor: 'pointer', padding: 6, fontSize: 22 }}
+              style={{ background: 'none', border: 'none', color: '#f8fafc', cursor: 'pointer', padding: 6, fontSize: 24 }}
               className="show-mobile"
               aria-label="Toggle Navigation"
             >
@@ -133,19 +133,79 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
         {/* Mobile dropdown */}
         {menuOpen && (
-          <div style={{ borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-deep-navy)', padding: '12px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {navLinks.map(({ to, label, icon }) => (
-              <Link
-                key={to}
-                to={to}
-                onClick={() => setMenuOpen(false)}
-                className={`nav-link ${isActive(to) ? 'active' : ''}`}
-                style={{ width: '100%' }}
-              >
-                {icon}
-                <span>{label}</span>
-              </Link>
-            ))}
+          <div style={{
+            borderTop: '1px solid var(--border-subtle)',
+            background: 'rgba(13, 30, 24, 0.98)',
+            backdropFilter: 'blur(20px)',
+            padding: '16px 20px',
+            display: 'flex', flexDirection: 'column', gap: 12,
+            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.6)',
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {navLinks.map(({ to, label, icon }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMenuOpen(false)}
+                  className={`nav-link ${isActive(to) ? 'active' : ''}`}
+                  style={{ width: '100%', padding: '10px 14px' }}
+                >
+                  <span>{icon}</span>
+                  <span>{label}</span>
+                </Link>
+              ))}
+            </div>
+
+            <div style={{ height: 1, background: 'var(--border-subtle)', margin: '2px 0' }} />
+
+            {/* Mobile Auth Actions */}
+            {isAuthenticated ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px' }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #10b981, #34d399)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 14, fontWeight: 700, color: '#ffffff',
+                  }}>
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>{user?.name}</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8' }}>{user?.email}</span>
+                  </div>
+                </div>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                  onClick={() => { handleLogout(); setMenuOpen(false); }}
+                >
+                  <HiArrowRightOnRectangle style={{ fontSize: 15 }} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 10 }}>
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="btn btn-secondary btn-md"
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
+                  <HiArrowRightEndOnRectangle style={{ fontSize: 15 }} />
+                  <span>Login</span>
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setMenuOpen(false)}
+                  className="btn btn-primary btn-md"
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
+                  <HiUserPlus style={{ fontSize: 15 }} />
+                  <span>Sign Up</span>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </nav>

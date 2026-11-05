@@ -16,8 +16,8 @@ import {
 } from 'react-icons/hi2';
 import { eventService, categoryService, type Event, type Category } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
-import { useState } from 'react';
-import { getEventImage } from '../assets/images';
+import { useState, useEffect } from 'react';
+import { getEventImage, getCategoryFallback } from '../assets/images';
 
 const CATEGORY_ICON: Record<string, React.ReactElement> = {
   Technology: <HiCpuChip style={{ color: '#10b981' }} />,
@@ -37,12 +37,20 @@ function EventCard({ event }: { event: Event }) {
   const date = new Date(event.dateTime);
   const seatsLeft = event.availableSeats;
   const isSoldOut = seatsLeft === 0;
-  const eventImg = getEventImage(event.imageUrl, event.category?.name);
+  const [imgSrc, setImgSrc] = useState(getEventImage(event.imageUrl, event.category?.name));
+
+  useEffect(() => {
+    setImgSrc(getEventImage(event.imageUrl, event.category?.name));
+  }, [event.imageUrl, event.category?.name]);
 
   return (
     <div className="event-card" onClick={() => navigate(`/events/${event.id}`)} style={{ cursor: 'pointer' }}>
       <div className="event-card-img-wrap">
-        <img src={eventImg} alt={event.title} />
+        <img
+          src={imgSrc}
+          alt={event.title}
+          onError={() => setImgSrc(getCategoryFallback(event.category?.name))}
+        />
         <div style={{ position: 'absolute', top: 12, right: 12 }}>
           <span className={`badge ${isSoldOut ? 'badge-rose' : 'badge-green'}`}>
             {isSoldOut ? 'Sold Out' : `${seatsLeft} left`}
@@ -241,7 +249,7 @@ export default function HomePage() {
           ) : (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
               gap: 26,
             }}>
               {events.map((event) => <EventCard key={event.id} event={event} />)}

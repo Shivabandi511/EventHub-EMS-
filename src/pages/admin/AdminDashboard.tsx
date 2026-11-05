@@ -77,7 +77,7 @@ export default function AdminDashboard() {
           <StatCard icon={<HiBanknotes style={{ color: '#fbbf24' }} />} label="Platform Status"   value="Active"       color="rgba(245, 158, 11, 0.18)" />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 24 }}>
           {/* Recent Events */}
           <div className="glass-card" style={{ padding: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>

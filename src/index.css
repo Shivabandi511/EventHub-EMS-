@@ -275,7 +275,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .input.error {
-  border-color: var(--color-error);
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.input.error:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
 }
 
 .label {
@@ -290,8 +296,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .error-text {
   font-size: 12px;
-  color: var(--color-error);
-  margin-top: 4px;
+  color: #f87171;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
 }
 
 .divider {
@@ -652,10 +662,178 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ─── Responsive utilities ───────────────────────────────── */
+.hidden-mobile { display: inline-flex; }
+.show-mobile { display: none; }
+
 @media (max-width: 768px) {
   .hidden-mobile { display: none !important; }
-  .show-mobile { display: flex !important; }
+  .show-mobile { display: inline-flex !important; }
+
+  .container-app {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .page-container {
+    padding: 20px 16px !important;
+  }
+
+  .glass-card {
+    border-radius: 14px !important;
+  }
 }
+
+@media (max-width: 540px) {
+  .booking-card-item {
+    flex-direction: column !important;
+    padding: 16px !important;
+    gap: 14px !important;
+  }
+
+  .booking-card-item > div:first-child {
+    width: 100% !important;
+    height: 140px !important;
+  }
+
+  .filter-chips-row {
+    gap: 6px;
+  }
+
+  .pagination-container {
+    gap: 4px;
+  }
+
+  .btn-lg {
+    padding: 11px 18px !important;
+    font-size: 14px !important;
+  }
+
+  .modal-box {
+    padding: 20px 16px !important;
+  }
+}
+
 @media (min-width: 769px) {
   .show-mobile { display: none !important; }
+}
+
+/* ─── Responsive Layout Grids ───────────────────────────── */
+.events-layout-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 1023px) {
+  .filter-sidebar-card {
+    display: none;
+    position: static !important;
+    max-height: none !important;
+    width: 100% !important;
+  }
+  .filter-sidebar-card.mobile-open {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .events-layout-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .filter-sidebar-card {
+    display: block !important;
+    position: sticky !important;
+    top: 88px;
+    max-height: calc(100vh - 108px);
+    overflow-y: auto;
+  }
+}
+
+.event-detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .event-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+}
+
+.booking-layout-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .booking-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+/* ─── Touch Smooth Scroll ───────────────────────────────── */
+.table-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Admin Mobile Responsive Helpers ────────────────────── */
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .admin-sidebar-overlay.open {
+    display: block;
+  }
+
+  .admin-sidebar-drawer {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    z-index: 100 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 0 32px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .admin-sidebar-drawer.open {
+    transform: translateX(0) !important;
+  }
+
+  .admin-main-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .admin-main-content {
+    padding: 16px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-sidebar-drawer {
+    transform: none !important;
+  }
+
+  .admin-main-content {
+    padding: 32px;
+  }
 }

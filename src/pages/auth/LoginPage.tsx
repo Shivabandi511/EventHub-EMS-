@@ -6,8 +6,11 @@ import {
   HiEnvelope, 
   HiLockClosed, 
   HiArrowRightEndOnRectangle, 
-  HiExclamationTriangle, 
-  HiLightBulb 
+  HiExclamationTriangle,
+  HiCheckCircle,
+  HiXMark,
+  HiEye,
+  HiEyeSlash
 } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
@@ -17,9 +20,17 @@ export default function LoginPage() {
   const { login } = useAuth();
 
   const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  // Forgot password state
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotError, setForgotError] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -49,6 +60,32 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      setForgotError('Please enter your email address');
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(forgotEmail)) {
+      setForgotError('Please enter a valid email address');
+      return;
+    }
+    setForgotError('');
+    setForgotLoading(true);
+
+    setTimeout(() => {
+      setForgotLoading(false);
+      setForgotSuccess(true);
+    }, 700);
+  };
+
+  const closeForgotModal = () => {
+    setShowForgotModal(false);
+    setForgotEmail('');
+    setForgotError('');
+    setForgotSuccess(false);
   };
 
   return (
@@ -104,15 +141,58 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="label" htmlFor="login-password">
-                <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />
-                <span>Password</span>
-              </label>
-              <input
-                id="login-password" type="password" className={`input${errors.password ? ' error' : ''}`}
-                placeholder="••••••••" value={form.password}
-                onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <label className="label" htmlFor="login-password" style={{ marginBottom: 0 }}>
+                  <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />
+                  <span>Password</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(true)}
+                  style={{
+                    background: 'none', border: 'none',
+                    color: '#34d399', fontSize: 12, fontWeight: 600,
+                    cursor: 'pointer', padding: 0, textDecoration: 'none'
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  className={`input${errors.password ? ' error' : ''}`}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                  style={{ paddingRight: 42 }}
+                />
+                <button
+                  type="button"
+                  id="toggle-password-visibility"
+                  onClick={() => setShowPassword(p => !p)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 4,
+                    cursor: 'pointer',
+                    color: showPassword ? '#10b981' : '#94a3b8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.15s ease'
+                  }}
+                >
+                  {showPassword ? <HiEyeSlash style={{ fontSize: 18 }} /> : <HiEye style={{ fontSize: 18 }} />}
+                </button>
+              </div>
               {errors.password && <p className="error-text">{errors.password}</p>}
             </div>
 
@@ -134,18 +214,107 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
-        {/* Demo hint */}
-        <div style={{
-          marginTop: 16, padding: '12px 16px', borderRadius: 10,
-          background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)',
-          fontSize: 12, color: '#34d399', textAlign: 'center',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }}>
-          <HiLightBulb style={{ fontSize: 16, flexShrink: 0, color: '#34d399' }} />
-          <span>Demo: use <strong style={{ color: '#f8fafc' }}>admin@eventhub.com</strong> / <strong style={{ color: '#f8fafc' }}>admin123</strong> for admin access</span>
-        </div>
       </div>
+
+      {/* ── Forgot Password Modal ── */}
+      {showForgotModal && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && closeForgotModal()}>
+          <div className="modal-box" style={{ maxWidth: 440 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <HiLockClosed style={{ color: '#10b981' }} />
+                <span>Reset Password</span>
+              </h2>
+              <button
+                onClick={closeForgotModal}
+                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22 }}
+                aria-label="Close modal"
+              >
+                <HiXMark />
+              </button>
+            </div>
+
+            {forgotSuccess ? (
+              <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                <div style={{
+                  width: 54, height: 54, borderRadius: '50%',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 28, color: '#34d399', margin: '0 auto 16px'
+                }}>
+                  <HiCheckCircle />
+                </div>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f8fafc', marginBottom: 8 }}>
+                  Password Reset Link Sent!
+                </h3>
+                <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, marginBottom: 24 }}>
+                  We've sent instructions to <strong style={{ color: '#34d399' }}>{forgotEmail}</strong>. Please check your inbox and spam folder.
+                </p>
+                <button
+                  className="btn btn-primary btn-md"
+                  style={{ width: '100%' }}
+                  onClick={closeForgotModal}
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.5 }}>
+                  Enter your registered email address and we'll send you a link to reset your password.
+                </p>
+
+                {forgotError && (
+                  <div style={{
+                    background: 'rgba(248, 113, 113, 0.15)', border: '1px solid rgba(248, 113, 113, 0.3)',
+                    borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#f87171',
+                    display: 'flex', alignItems: 'center', gap: 8
+                  }}>
+                    <HiExclamationTriangle style={{ fontSize: 16, flexShrink: 0 }} />
+                    <span>{forgotError}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="label" htmlFor="forgot-email">
+                    <HiEnvelope style={{ fontSize: 14, color: '#10b981' }} />
+                    <span>Email address</span>
+                  </label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    className={`input${forgotError ? ' error' : ''}`}
+                    placeholder="you@example.com"
+                    value={forgotEmail}
+                    onChange={e => { setForgotEmail(e.target.value); setForgotError(''); }}
+                    autoFocus
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-md"
+                    style={{ flex: 1 }}
+                    onClick={closeForgotModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-md"
+                    style={{ flex: 1 }}
+                    disabled={forgotLoading}
+                  >
+                    {forgotLoading ? 'Sending…' : 'Send Link'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

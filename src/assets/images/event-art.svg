@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="artEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06120E" />
+      <stop offset="50%" stop-color="#1A1829" />
+      <stop offset="100%" stop-color="#0F766E" />
+    </linearGradient>
+    <linearGradient id="coralGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#artEmerald)" />
+  <circle cx="200" cy="120" r="160" fill="url(#coralGlow)" fill-opacity="0.25" />
+  <circle cx="650" cy="350" r="180" fill="#10B981" fill-opacity="0.2" />
+
+  <!-- Palette curves -->
+  <g stroke="#34D399" stroke-width="2" stroke-opacity="0.3" fill="none">
+    <ellipse cx="400" cy="150" rx="46" ry="36" />
+    <circle cx="380" cy="140" r="5" fill="#EC4899" />
+    <circle cx="400" cy="132" r="5" fill="#F59E0B" />
+    <circle cx="420" cy="140" r="5" fill="#34D399" />
+    <circle cx="410" cy="158" r="7" fill="#0D1E18" stroke="#34D399" stroke-width="2" />
+  </g>
+
+  <text x="400" y="275" font-family="'Outfit', sans-serif" font-size="28" font-weight="800" fill="#ffffff" text-anchor="middle">Arts &amp; Cultural Showcase</text>
+  <text x="400" y="310" font-family="'Inter', sans-serif" font-size="15" fill="#E2E8F0" text-anchor="middle">Exhibitions · Theater · Fine Arts &amp; Digital Exhibits</text>
+  <rect x="335" y="338" width="130" height="28" rx="14" fill="#10B981" fill-opacity="0.25" stroke="#34D399" stroke-width="1.5" />
+  <text x="400" y="357" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#ECFDF5" text-anchor="middle">ARTS &amp; CULTURE</text>
+</svg>
+

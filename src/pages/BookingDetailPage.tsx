@@ -112,7 +112,7 @@ export default function BookingDetailPage() {
             <HiTicket style={{ fontSize: 18 }} />
             <span>Ticket Summary</span>
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 12 }}>
             {[
               { label: 'Tickets Count',  value: `${booking.ticketCount}` },
               { label: 'Price / Ticket', value: `₹${booking.event?.price ?? 0}` },

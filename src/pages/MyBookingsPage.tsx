@@ -17,7 +17,7 @@ import {
 import { bookingService, type Booking } from '../services/bookingService';
 import type { PagedResponse } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
-import { getEventImage } from '../assets/images';
+import { getEventImage, getCategoryFallback } from '../assets/images';
 
 const STATUS_FILTERS = [
   { id: 'ALL', label: 'All Bookings' },
@@ -36,13 +36,18 @@ function BookingCard({ booking }: { booking: Booking }) {
     PENDING:   { label: 'Pending',   cls: 'badge-amber' },
   };
   const s = statusMap[booking.status] ?? { label: booking.status, cls: 'badge-purple' };
-  const eventImg = getEventImage(booking.event?.imageUrl, booking.event?.title);
+  const [imgSrc, setImgSrc] = useState(getEventImage(booking.event?.imageUrl, booking.event?.title));
 
   return (
     <div className="booking-card-item">
       {/* Event Thumb / Icon */}
       <div style={{ width: 84, height: 84, borderRadius: 14, overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
-        <img src={eventImg} alt={booking.event?.title ?? 'Event'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img
+          src={imgSrc}
+          alt={booking.event?.title ?? 'Event'}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          onError={() => setImgSrc(getCategoryFallback(booking.event?.title))}
+        />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(16, 185, 129, 0.15)' }} />
       </div>
 

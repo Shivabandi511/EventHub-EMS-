@@ -73,7 +73,7 @@ export default function BookingConfirmationPage() {
                 <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Event Title</p>
                 <p style={{ fontSize: 20, fontWeight: 700, color: '#f8fafc' }}>{booking.event?.title}</p>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
                 {[
                   { icon: <HiCalendar style={{ color: '#34d399' }} />, label: 'Date & Time', value: booking.event?.dateTime ? new Date(booking.event.dateTime).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—' },
                   { icon: <HiMapPin style={{ color: '#22d3ee' }} />, label: 'Venue',       value: booking.event?.venue ? `${booking.event.venue.name}, ${booking.event.venue.city}` : '—' },

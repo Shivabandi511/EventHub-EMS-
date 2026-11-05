@@ -57,7 +57,7 @@ export default function ProfilePage() {
         </h1>
 
         {/* Avatar card */}
-        <div className="glass-card" style={{ padding: 28, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div className="glass-card" style={{ padding: 'clamp(20px, 4vw, 28px)', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
           <div style={{
             width: 76, height: 76, borderRadius: '50%', flexShrink: 0,
             background: 'linear-gradient(135deg, #10b981, #34d399)',

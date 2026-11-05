@@ -121,7 +121,7 @@ export default function BookingPage() {
         </h1>
 
         <form onSubmit={handleSubmit} noValidate>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: 28, alignItems: 'start' }}>
+          <div className="booking-layout-grid">
             {/* Left */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Ticket Count */}

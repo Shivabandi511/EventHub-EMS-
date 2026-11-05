@@ -12,9 +12,10 @@ import {
   HiNoSymbol
 } from 'react-icons/hi2';
 import { eventService } from '../services/eventService';
+import { useState, useEffect } from 'react';
 import CustomerLayout from '../layouts/CustomerLayout';
 import { useAuth } from '../context/AuthContext';
-import { getEventImage } from '../assets/images';
+import { getEventImage, getCategoryFallback } from '../assets/images';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -56,7 +57,11 @@ export default function EventDetailPage() {
   const date       = new Date(event.dateTime);
   const isSoldOut  = event.availableSeats === 0;
   const isCancelled = event.status === 'CANCELLED';
-  const eventImg   = getEventImage(event.imageUrl, event.category?.name);
+  const [imgSrc, setImgSrc] = useState(getEventImage(event.imageUrl, event.category?.name));
+
+  useEffect(() => {
+    setImgSrc(getEventImage(event.imageUrl, event.category?.name));
+  }, [event.imageUrl, event.category?.name]);
 
   return (
     <CustomerLayout>
@@ -70,17 +75,22 @@ export default function EventDetailPage() {
           <span style={{ color: '#34d399', fontWeight: 600 }}>{event.title}</span>
         </nav>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 32, alignItems: 'start' }}>
+        <div className="event-detail-grid">
           {/* ── Left: Details ── */}
           <div>
             {/* Event Image */}
             <div style={{
-              height: 360, borderRadius: 20, overflow: 'hidden',
+              height: 'clamp(220px, 45vw, 380px)', borderRadius: 20, overflow: 'hidden',
               background: 'var(--bg-deep-navy)',
               position: 'relative', marginBottom: 28,
               border: '1px solid var(--border-subtle)',
             }}>
-              <img src={eventImg} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img
+                src={imgSrc}
+                alt={event.title}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={() => setImgSrc(getCategoryFallback(event.category?.name))}
+              />
               <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 8 }}>
                 <span className="badge badge-purple">{event.category?.name}</span>
                 {isCancelled && <span className="badge badge-rose">Cancelled</span>}
@@ -89,12 +99,12 @@ export default function EventDetailPage() {
             </div>
 
             {/* Title */}
-            <h1 style={{ fontSize: 34, fontWeight: 800, color: '#f8fafc', marginBottom: 20, lineHeight: 1.2 }}>
+            <h1 style={{ fontSize: 'clamp(24px, 5vw, 34px)', fontWeight: 800, color: '#f8fafc', marginBottom: 20, lineHeight: 1.2 }}>
               {event.title}
             </h1>
 
             {/* Info Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 32 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: 16, marginBottom: 32 }}>
               {[
                 { icon: <HiCalendar style={{ color: '#34d399', fontSize: 20 }} />, label: 'Date & Time', value: `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} at ${date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` },
                 { icon: <HiMapPin style={{ color: '#22d3ee', fontSize: 20 }} />, label: 'Venue', value: `${event.venue?.name}, ${event.venue?.city}` },

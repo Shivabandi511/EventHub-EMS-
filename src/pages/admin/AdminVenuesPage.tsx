@@ -5,46 +5,154 @@ import {
   HiPlus, 
   HiPencilSquare, 
   HiTrash, 
-  HiXMark 
+  HiXMark,
+  HiExclamationTriangle,
+  HiExclamationCircle
 } from 'react-icons/hi2';
 import { venueService, type Venue } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
-const EMPTY: Partial<Venue> = { name: '', address: '', city: '', capacity: 0 };
+interface VenueForm {
+  name: string;
+  address: string;
+  city: string;
+  capacity: string;
+}
+
+const EMPTY: VenueForm = { name: '', address: '', city: '', capacity: '500' };
 
 export default function AdminVenuesPage() {
   const qc = useQueryClient();
   const [showModal, setShowModal]   = useState(false);
   const [editItem, setEditItem]     = useState<Venue | null>(null);
-  const [form, setForm]             = useState<Partial<Venue>>(EMPTY);
+  const [form, setForm]             = useState<VenueForm>(EMPTY);
   const [errors, setErrors]         = useState<Record<string, string>>({});
+  const [touched, setTouched]       = useState<Record<string, boolean>>({});
+  const [submitted, setSubmitted]   = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
   const { data, isLoading } = useQuery({ queryKey: ['venues'], queryFn: () => venueService.getAll() });
   const venues: Venue[] = data?.data ?? [];
 
-  const openCreate = () => { setEditItem(null); setForm(EMPTY); setErrors({}); setShowModal(true); };
-  const openEdit   = (v: Venue) => { setEditItem(v); setForm({ name: v.name, address: v.address, city: v.city, capacity: v.capacity }); setErrors({}); setShowModal(true); };
+  const validateField = (field: keyof VenueForm, val: string): string => {
+    switch (field) {
+      case 'name':
+        if (!val.trim()) return 'Venue name is required';
+        if (val.trim().length < 3) return 'Venue name must be at least 3 characters';
+        if (val.trim().length > 100) return 'Venue name cannot exceed 100 characters';
+        return '';
+      case 'city':
+        if (!val.trim()) return 'City is required';
+        if (val.trim().length < 2) return 'City must be at least 2 characters';
+        return '';
+      case 'address':
+        if (!val.trim()) return 'Address is required';
+        if (val.trim().length < 5) return 'Address must be at least 5 characters';
+        return '';
+      case 'capacity': {
+        if (!val) return 'Seating capacity is required';
+        const num = Number(val);
+        if (isNaN(num) || !Number.isInteger(num)) return 'Capacity must be a whole number';
+        if (num < 1) return 'Capacity must be at least 1 seat';
+        if (num > 500000) return 'Capacity cannot exceed 5,00,000 seats';
+        return '';
+      }
+      default:
+        return '';
+    }
+  };
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.name?.trim())    e.name    = 'Venue name is required';
-    if (!form.address?.trim()) e.address = 'Address is required';
-    if (!form.city?.trim())    e.city    = 'City is required';
-    if (!form.capacity || Number(form.capacity) < 1) e.capacity = 'Capacity must be at least 1';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+  const validateAll = (data = form): Record<string, string> => {
+    const errs: Record<string, string> = {};
+    (Object.keys(data) as Array<keyof VenueForm>).forEach(key => {
+      const msg = validateField(key, data[key]);
+      if (msg) errs[key] = msg;
+    });
+    return errs;
+  };
+
+  const handleChange = (field: keyof VenueForm, value: string) => {
+    const nextForm = { ...form, [field]: value };
+    setForm(nextForm);
+    if (touched[field] || submitted) {
+      const msg = validateField(field, value);
+      setErrors(prev => {
+        const next = { ...prev };
+        if (msg) next[field] = msg;
+        else delete next[field];
+        return next;
+      });
+    }
+  };
+
+  const handleBlur = (field: keyof VenueForm) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const msg = validateField(field, form[field]);
+    setErrors(prev => {
+      const next = { ...prev };
+      if (msg) next[field] = msg;
+      else delete next[field];
+      return next;
+    });
+  };
+
+  const openCreate = () => {
+    setEditItem(null);
+    setForm(EMPTY);
+    setErrors({});
+    setTouched({});
+    setSubmitted(false);
+    setShowModal(true);
+  };
+
+  const openEdit = (v: Venue) => {
+    setEditItem(v);
+    setForm({
+      name: v.name,
+      address: v.address,
+      city: v.city,
+      capacity: String(v.capacity)
+    });
+    setErrors({});
+    setTouched({});
+    setSubmitted(false);
+    setShowModal(true);
   };
 
   const saveMutation = useMutation({
-    mutationFn: () => editItem ? venueService.update(editItem.id, form) : venueService.create(form),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['venues'] }); setShowModal(false); },
+    mutationFn: () => {
+      const payload = {
+        name: form.name.trim(),
+        address: form.address.trim(),
+        city: form.city.trim(),
+        capacity: Number(form.capacity),
+      };
+      return editItem ? venueService.update(editItem.id, payload) : venueService.create(payload);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['venues'] });
+      setShowModal(false);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => venueService.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['venues'] }); setDeleteConfirm(null); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['venues'] });
+      setDeleteConfirm(null);
+    },
   });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTouched({ name: true, city: true, address: true, capacity: true });
+    const allErrors = validateAll(form);
+    setErrors(allErrors);
+    if (Object.keys(allErrors).length === 0) {
+      saveMutation.mutate();
+    }
+  };
 
   return (
     <AdminLayout>
@@ -123,33 +231,105 @@ export default function AdminVenuesPage() {
               </button>
             </div>
 
-            <form onSubmit={e => { e.preventDefault(); if (validate()) saveMutation.mutate(); }} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {submitted && Object.keys(errors).length > 0 && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                  fontSize: 13,
+                  color: '#f87171',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}>
+                  <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
+                  <span>Please correct the {Object.keys(errors).length} highlighted field{Object.keys(errors).length > 1 ? 's' : ''} below.</span>
+                </div>
+              )}
+
               <div>
-                <label className="label" htmlFor="vn-name">Venue Name *</label>
-                <input id="vn-name" className={`input${errors.name ? ' error' : ''}`} placeholder="e.g. HITEX Exhibition Center"
-                  value={form.name ?? ''} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-                {errors.name && <p className="error-text">{errors.name}</p>}
+                <label className="label" htmlFor="vn-name">
+                  Venue Name <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="vn-name"
+                  className={`input${errors.name ? ' error' : ''}`}
+                  placeholder="e.g. HITEX Exhibition Center"
+                  value={form.name}
+                  onChange={e => handleChange('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
+                />
+                {errors.name && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.name}</span>
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="label" htmlFor="vn-city">City *</label>
-                <input id="vn-city" className={`input${errors.city ? ' error' : ''}`} placeholder="e.g. Hyderabad"
-                  value={form.city ?? ''} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} />
-                {errors.city && <p className="error-text">{errors.city}</p>}
+                <label className="label" htmlFor="vn-city">
+                  City <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="vn-city"
+                  className={`input${errors.city ? ' error' : ''}`}
+                  placeholder="e.g. Hyderabad"
+                  value={form.city}
+                  onChange={e => handleChange('city', e.target.value)}
+                  onBlur={() => handleBlur('city')}
+                />
+                {errors.city && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.city}</span>
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="label" htmlFor="vn-addr">Address *</label>
-                <input id="vn-addr" className={`input${errors.address ? ' error' : ''}`} placeholder="Street / Area address"
-                  value={form.address ?? ''} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} />
-                {errors.address && <p className="error-text">{errors.address}</p>}
+                <label className="label" htmlFor="vn-addr">
+                  Address <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="vn-addr"
+                  className={`input${errors.address ? ' error' : ''}`}
+                  placeholder="Street / Area / Landmark"
+                  value={form.address}
+                  onChange={e => handleChange('address', e.target.value)}
+                  onBlur={() => handleBlur('address')}
+                />
+                {errors.address && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.address}</span>
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="label" htmlFor="vn-cap">Capacity *</label>
-                <input id="vn-cap" type="number" min="1" className={`input${errors.capacity ? ' error' : ''}`} placeholder="e.g. 5000"
-                  value={form.capacity ?? ''} onChange={e => setForm(p => ({ ...p, capacity: Number(e.target.value) }))} />
-                {errors.capacity && <p className="error-text">{errors.capacity}</p>}
+                <label className="label" htmlFor="vn-cap">
+                  Capacity <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="vn-cap"
+                  type="number"
+                  min="1"
+                  step="1"
+                  className={`input${errors.capacity ? ' error' : ''}`}
+                  placeholder="e.g. 5000"
+                  value={form.capacity}
+                  onChange={e => handleChange('capacity', e.target.value)}
+                  onBlur={() => handleBlur('capacity')}
+                />
+                {errors.capacity && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.capacity}</span>
+                  </p>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>

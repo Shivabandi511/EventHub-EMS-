@@ -5,41 +5,130 @@ import {
   HiPlus, 
   HiPencilSquare, 
   HiTrash, 
-  HiXMark 
+  HiXMark,
+  HiExclamationTriangle,
+  HiExclamationCircle
 } from 'react-icons/hi2';
 import { categoryService, type Category } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
+
+interface CategoryForm {
+  name: string;
+  description: string;
+}
 
 export default function AdminCategoriesPage() {
   const qc = useQueryClient();
   const [showModal, setShowModal]   = useState(false);
   const [editItem, setEditItem]     = useState<Category | null>(null);
-  const [form, setForm]             = useState({ name: '', description: '' });
+  const [form, setForm]             = useState<CategoryForm>({ name: '', description: '' });
   const [errors, setErrors]         = useState<Record<string, string>>({});
+  const [touched, setTouched]       = useState<Record<string, boolean>>({});
+  const [submitted, setSubmitted]   = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
   const { data, isLoading } = useQuery({ queryKey: ['categories'], queryFn: () => categoryService.getAll() });
   const categories: Category[] = data?.data ?? [];
 
-  const openCreate = () => { setEditItem(null); setForm({ name: '', description: '' }); setErrors({}); setShowModal(true); };
-  const openEdit   = (c: Category) => { setEditItem(c); setForm({ name: c.name, description: c.description ?? '' }); setErrors({}); setShowModal(true); };
+  const validateField = (field: keyof CategoryForm, val: string): string => {
+    switch (field) {
+      case 'name':
+        if (!val.trim()) return 'Category name is required';
+        if (val.trim().length < 2) return 'Category name must be at least 2 characters';
+        if (val.trim().length > 60) return 'Category name cannot exceed 60 characters';
+        return '';
+      case 'description':
+        if (val.trim() && val.trim().length < 5) return 'Description must be at least 5 characters if provided';
+        return '';
+      default:
+        return '';
+    }
+  };
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.name.trim()) e.name = 'Category name is required';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+  const validateAll = (data = form): Record<string, string> => {
+    const errs: Record<string, string> = {};
+    (Object.keys(data) as Array<keyof CategoryForm>).forEach(key => {
+      const msg = validateField(key, data[key]);
+      if (msg) errs[key] = msg;
+    });
+    return errs;
+  };
+
+  const handleChange = (field: keyof CategoryForm, value: string) => {
+    const nextForm = { ...form, [field]: value };
+    setForm(nextForm);
+    if (touched[field] || submitted) {
+      const msg = validateField(field, value);
+      setErrors(prev => {
+        const next = { ...prev };
+        if (msg) next[field] = msg;
+        else delete next[field];
+        return next;
+      });
+    }
+  };
+
+  const handleBlur = (field: keyof CategoryForm) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const msg = validateField(field, form[field]);
+    setErrors(prev => {
+      const next = { ...prev };
+      if (msg) next[field] = msg;
+      else delete next[field];
+      return next;
+    });
+  };
+
+  const openCreate = () => {
+    setEditItem(null);
+    setForm({ name: '', description: '' });
+    setErrors({});
+    setTouched({});
+    setSubmitted(false);
+    setShowModal(true);
+  };
+
+  const openEdit = (c: Category) => {
+    setEditItem(c);
+    setForm({ name: c.name, description: c.description ?? '' });
+    setErrors({});
+    setTouched({});
+    setSubmitted(false);
+    setShowModal(true);
   };
 
   const saveMutation = useMutation({
-    mutationFn: () => editItem ? categoryService.update(editItem.id, form) : categoryService.create(form),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); setShowModal(false); },
+    mutationFn: () => {
+      const payload = {
+        name: form.name.trim(),
+        description: form.description.trim() || undefined,
+      };
+      return editItem ? categoryService.update(editItem.id, payload) : categoryService.create(payload);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['categories'] });
+      setShowModal(false);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => categoryService.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); setDeleteConfirm(null); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['categories'] });
+      setDeleteConfirm(null);
+    },
   });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTouched({ name: true, description: true });
+    const allErrors = validateAll(form);
+    setErrors(allErrors);
+    if (Object.keys(allErrors).length === 0) {
+      saveMutation.mutate();
+    }
+  };
 
   return (
     <AdminLayout>
@@ -124,19 +213,62 @@ export default function AdminCategoriesPage() {
               </button>
             </div>
 
-            <form onSubmit={e => { e.preventDefault(); if (validate()) saveMutation.mutate(); }} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {submitted && Object.keys(errors).length > 0 && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                  fontSize: 13,
+                  color: '#f87171',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}>
+                  <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
+                  <span>Please enter a valid category name.</span>
+                </div>
+              )}
+
               <div>
-                <label className="label" htmlFor="cat-name">Category Name *</label>
-                <input id="cat-name" className={`input${errors.name ? ' error' : ''}`} placeholder="e.g. Technology"
-                  value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-                {errors.name && <p className="error-text">{errors.name}</p>}
+                <label className="label" htmlFor="cat-name">
+                  Category Name <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="cat-name"
+                  className={`input${errors.name ? ' error' : ''}`}
+                  placeholder="e.g. Technology & AI"
+                  value={form.name}
+                  onChange={e => handleChange('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
+                />
+                {errors.name && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.name}</span>
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="label" htmlFor="cat-desc">Description</label>
-                <textarea id="cat-desc" className="input" placeholder="Brief description…" rows={3}
-                  value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                  style={{ resize: 'vertical' }} />
+                <textarea
+                  id="cat-desc"
+                  className={`input${errors.description ? ' error' : ''}`}
+                  placeholder="Brief description of the events in this category…"
+                  rows={3}
+                  value={form.description}
+                  onChange={e => handleChange('description', e.target.value)}
+                  onBlur={() => handleBlur('description')}
+                  style={{ resize: 'vertical' }}
+                />
+                {errors.description && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.description}</span>
+                  </p>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>

@@ -8,7 +8,9 @@ import {
   HiPhone, 
   HiLockClosed, 
   HiUserPlus, 
-  HiExclamationTriangle 
+  HiExclamationTriangle,
+  HiEye,
+  HiEyeSlash
 } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
@@ -18,6 +20,8 @@ export default function RegisterPage() {
   const { login } = useAuth();
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -62,20 +66,63 @@ export default function RegisterPage() {
     id: string, label: string, type: string,
     placeholder: string, key: keyof typeof form,
     icon: React.ReactElement
-  ) => (
-    <div>
-      <label className="label" htmlFor={id}>
-        {icon}
-        <span>{label}</span>
-      </label>
-      <input
-        id={id} type={type} className={`input${errors[key] ? ' error' : ''}`}
-        placeholder={placeholder} value={form[key]}
-        onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
-      />
-      {errors[key] && <p className="error-text">{errors[key]}</p>}
-    </div>
-  );
+  ) => {
+    const isPass = key === 'password';
+    const isConfirm = key === 'confirmPassword';
+    const isPasswordField = isPass || isConfirm;
+    const isVisible = isPass ? showPassword : isConfirm ? showConfirmPassword : false;
+    const inputType = isPasswordField ? (isVisible ? 'text' : 'password') : type;
+    const toggleVisible = () => {
+      if (isPass) setShowPassword(p => !p);
+      if (isConfirm) setShowConfirmPassword(p => !p);
+    };
+
+    return (
+      <div>
+        <label className="label" htmlFor={id}>
+          {icon}
+          <span>{label}</span>
+        </label>
+        <div style={{ position: 'relative' }}>
+          <input
+            id={id}
+            type={inputType}
+            className={`input${errors[key] ? ' error' : ''}`}
+            placeholder={placeholder}
+            value={form[key]}
+            onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
+            style={isPasswordField ? { paddingRight: 42 } : undefined}
+          />
+          {isPasswordField && (
+            <button
+              type="button"
+              onClick={toggleVisible}
+              aria-label={isVisible ? 'Hide password' : 'Show password'}
+              title={isVisible ? 'Hide password' : 'Show password'}
+              style={{
+                position: 'absolute',
+                right: 12,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'transparent',
+                border: 'none',
+                padding: 4,
+                cursor: 'pointer',
+                color: isVisible ? '#10b981' : '#94a3b8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'color 0.15s ease'
+              }}
+            >
+              {isVisible ? <HiEyeSlash style={{ fontSize: 18 }} /> : <HiEye style={{ fontSize: 18 }} />}
+            </button>
+          )}
+        </div>
+        {errors[key] && <p className="error-text">{errors[key]}</p>}
+      </div>
+    );
+  };
 
   return (
     <div style={{

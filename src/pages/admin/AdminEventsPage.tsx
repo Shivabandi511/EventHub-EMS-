@@ -12,20 +12,36 @@ import {
   HiTicket, 
   HiXMark,
   HiExclamationTriangle,
+  HiExclamationCircle,
   HiMagnifyingGlass,
-  HiFunnel
+  HiFunnel,
+  HiPhoto
 } from 'react-icons/hi2';
 import { eventService, categoryService, venueService, type Event, type Category, type Venue } from '../../services/eventService';
 import AdminLayout from '../../layouts/AdminLayout';
 
 interface EventForm {
-  title: string; description: string; categoryId: string; venueId: string;
-  dateTime: string; price: string; totalSeats: string; status: string;
+  title: string;
+  description: string;
+  categoryId: string;
+  venueId: string;
+  dateTime: string;
+  price: string;
+  totalSeats: string;
+  status: string;
+  imageUrl: string;
 }
 
 const EMPTY_FORM: EventForm = {
-  title: '', description: '', categoryId: '', venueId: '',
-  dateTime: '', price: '', totalSeats: '', status: 'ACTIVE',
+  title: '',
+  description: '',
+  categoryId: '',
+  venueId: '',
+  dateTime: '',
+  price: '0',
+  totalSeats: '100',
+  status: 'ACTIVE',
+  imageUrl: '',
 };
 
 export default function AdminEventsPage() {
@@ -34,6 +50,8 @@ export default function AdminEventsPage() {
   const [editEvent, setEditEvent] = useState<Event | null>(null);
   const [form, setForm] = useState<EventForm>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitted, setSubmitted] = useState(false);
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCatId, setSelectedCatId] = useState<string>('ALL');
@@ -67,39 +85,157 @@ export default function AdminEventsPage() {
   const totalPages = Math.ceil(filteredEvents.length / pageSize) || 1;
   const pagedEvents = filteredEvents.slice(page * pageSize, (page + 1) * pageSize);
 
-  const openCreate = () => { setEditEvent(null); setForm(EMPTY_FORM); setErrors({}); setShowModal(true); };
-  const openEdit   = (ev: Event) => {
-    setEditEvent(ev);
-    setForm({
-      title: ev.title, description: ev.description ?? '',
-      categoryId: String(ev.category?.id ?? ''), venueId: String(ev.venue?.id ?? ''),
-      dateTime: ev.dateTime?.slice(0, 16) ?? '', price: String(ev.price),
-      totalSeats: String(ev.totalSeats), status: ev.status,
+  const selectedVenue = useMemo(() => {
+    return venueList.find((v: Venue) => String(v.id) === String(form.venueId));
+  }, [venueList, form.venueId]);
+
+  const minDateTime = useMemo(() => {
+    const d = new Date(Date.now() + 5 * 60000); // at least 5 minutes in future
+    return d.toISOString().slice(0, 16);
+  }, []);
+
+  const validateField = (field: keyof EventForm, val: string, curForm = form): string => {
+    switch (field) {
+      case 'title':
+        if (!val.trim()) return 'Event title is required';
+        if (val.trim().length < 3) return 'Title must be at least 3 characters';
+        if (val.trim().length > 150) return 'Title cannot exceed 150 characters';
+        return '';
+      case 'description':
+        if (!val.trim()) return 'Description is required';
+        if (val.trim().length < 10) return 'Description must be at least 10 characters';
+        return '';
+      case 'categoryId':
+        if (!val) return 'Please select an event category';
+        return '';
+      case 'venueId':
+        if (!val) return 'Please select a venue';
+        return '';
+      case 'dateTime': {
+        if (!val) return 'Event date & time is required';
+        const parsed = new Date(val).getTime();
+        if (isNaN(parsed)) return 'Please enter a valid date & time';
+        if (parsed <= Date.now()) return 'Event date & time must be in the future';
+        return '';
+      }
+      case 'price': {
+        if (val === '' || val === null || val === undefined) return 'Ticket price is required (enter 0 for free events)';
+        const num = Number(val);
+        if (isNaN(num)) return 'Enter a valid numeric price';
+        if (num < 0) return 'Price cannot be negative';
+        if (num > 1000000) return 'Price cannot exceed ₹10,00,000';
+        return '';
+      }
+      case 'totalSeats': {
+        if (!val) return 'Total available seats is required';
+        const seats = Number(val);
+        if (isNaN(seats) || !Number.isInteger(seats)) return 'Seats must be a whole number';
+        if (seats < 1) return 'At least 1 seat is required';
+        const v = venueList.find((ven: Venue) => String(ven.id) === String(curForm.venueId));
+        if (v && seats > v.capacity) {
+          return `Seats cannot exceed venue capacity (${v.capacity.toLocaleString()} seats max)`;
+        }
+        return '';
+      }
+      case 'imageUrl':
+        if (val.trim() && !/^https?:\/\/.+/i.test(val.trim())) {
+          return 'Image URL must begin with http:// or https://';
+        }
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  const validateAll = (formData = form): Record<string, string> => {
+    const errs: Record<string, string> = {};
+    const fieldsToValidate: Array<keyof EventForm> = [
+      'title', 'description', 'categoryId', 'venueId', 'dateTime', 'price', 'totalSeats', 'imageUrl'
+    ];
+    fieldsToValidate.forEach(key => {
+      const msg = validateField(key, formData[key], formData);
+      if (msg) errs[key] = msg;
     });
+    return errs;
+  };
+
+  const handleFieldChange = (field: keyof EventForm, value: string) => {
+    const updated = { ...form, [field]: value };
+    setForm(updated);
+
+    if (touched[field] || submitted) {
+      const err = validateField(field, value, updated);
+      setErrors(prev => {
+        const next = { ...prev };
+        if (err) next[field] = err;
+        else delete next[field];
+        return next;
+      });
+    }
+
+    // When venue changes, re-evaluate totalSeats capacity check
+    if (field === 'venueId' && (touched.totalSeats || submitted)) {
+      const seatsErr = validateField('totalSeats', updated.totalSeats, updated);
+      setErrors(prev => {
+        const next = { ...prev };
+        if (seatsErr) next.totalSeats = seatsErr;
+        else delete next.totalSeats;
+        return next;
+      });
+    }
+  };
+
+  const handleFieldBlur = (field: keyof EventForm) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const err = validateField(field, form[field], form);
+    setErrors(prev => {
+      const next = { ...prev };
+      if (err) next[field] = err;
+      else delete next[field];
+      return next;
+    });
+  };
+
+  const openCreate = () => {
+    setEditEvent(null);
+    setForm(EMPTY_FORM);
     setErrors({});
+    setTouched({});
+    setSubmitted(false);
     setShowModal(true);
   };
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.title.trim())          e.title       = 'Title is required';
-    if (!form.categoryId)            e.categoryId  = 'Category is required';
-    if (!form.venueId)               e.venueId     = 'Venue is required';
-    if (!form.dateTime)              e.dateTime    = 'Date & time is required';
-    if (Number(form.price) < 0)      e.price       = 'Price cannot be negative';
-    if (Number(form.totalSeats) < 1) e.totalSeats  = 'At least 1 seat required';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+  const openEdit = (ev: Event) => {
+    setEditEvent(ev);
+    setForm({
+      title: ev.title,
+      description: ev.description ?? '',
+      categoryId: String(ev.category?.id ?? ''),
+      venueId: String(ev.venue?.id ?? ''),
+      dateTime: ev.dateTime?.slice(0, 16) ?? '',
+      price: String(ev.price),
+      totalSeats: String(ev.totalSeats),
+      status: ev.status,
+      imageUrl: ev.imageUrl ?? '',
+    });
+    setErrors({});
+    setTouched({});
+    setSubmitted(false);
+    setShowModal(true);
   };
 
   const saveMutation = useMutation({
     mutationFn: () => {
       const payload = {
-        title: form.title, description: form.description,
+        title: form.title.trim(),
+        description: form.description.trim(),
         category: { id: Number(form.categoryId) },
         venue:    { id: Number(form.venueId) },
-        dateTime: form.dateTime, price: Number(form.price),
-        totalSeats: Number(form.totalSeats), status: form.status,
+        dateTime: form.dateTime,
+        price: Number(form.price),
+        totalSeats: Number(form.totalSeats),
+        status: form.status,
+        imageUrl: form.imageUrl.trim() || undefined,
       };
       return editEvent
         ? eventService.updateEvent(editEvent.id, payload)
@@ -123,7 +259,17 @@ export default function AdminEventsPage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) saveMutation.mutate();
+    setSubmitted(true);
+    setTouched({
+      title: true, description: true, categoryId: true, venueId: true,
+      dateTime: true, price: true, totalSeats: true, imageUrl: true
+    });
+    const allErrors = validateAll(form);
+    setErrors(allErrors);
+
+    if (Object.keys(allErrors).length === 0) {
+      saveMutation.mutate();
+    }
   };
 
   return (
@@ -293,64 +439,207 @@ export default function AdminEventsPage() {
             </div>
 
             <form onSubmit={handleSave} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Form-level validation summary */}
+              {submitted && Object.keys(errors).length > 0 && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  fontSize: 13,
+                  color: '#f87171',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}>
+                  <HiExclamationTriangle style={{ fontSize: 20, flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ display: 'block', fontWeight: 700 }}>Validation Errors Detected</strong>
+                    <span>Please correct the {Object.keys(errors).length} highlighted field{Object.keys(errors).length > 1 ? 's' : ''} below to proceed.</span>
+                  </div>
+                </div>
+              )}
+
               <div>
-                <label className="label" htmlFor="ev-title">Event Title *</label>
-                <input id="ev-title" className={`input${errors.title ? ' error' : ''}`} placeholder="e.g. Annual Tech Symposium"
-                  value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
-                {errors.title && <p className="error-text">{errors.title}</p>}
+                <label className="label" htmlFor="ev-title">
+                  Event Title <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="ev-title"
+                  className={`input${errors.title ? ' error' : ''}`}
+                  placeholder="e.g. Annual Tech Symposium 2026"
+                  value={form.title}
+                  onChange={e => handleFieldChange('title', e.target.value)}
+                  onBlur={() => handleFieldBlur('title')}
+                />
+                {errors.title && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.title}</span>
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="label" htmlFor="ev-desc">Description</label>
-                <textarea id="ev-desc" className="input" placeholder="Describe the event, agenda, and speakers…" rows={3}
-                  value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                  style={{ resize: 'vertical' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label className="label" htmlFor="ev-desc">
+                    Description <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <span style={{ fontSize: 11, color: form.description.length < 10 ? '#f87171' : '#94a3b8' }}>
+                    {form.description.length} chars (min 10)
+                  </span>
+                </div>
+                <textarea
+                  id="ev-desc"
+                  className={`input${errors.description ? ' error' : ''}`}
+                  placeholder="Describe the event agenda, keynote speakers, and session highlights…"
+                  rows={3}
+                  value={form.description}
+                  onChange={e => handleFieldChange('description', e.target.value)}
+                  onBlur={() => handleFieldBlur('description')}
+                  style={{ resize: 'vertical' }}
+                />
+                {errors.description && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.description}</span>
+                  </p>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
                 <div>
-                  <label className="label" htmlFor="ev-cat">Category *</label>
-                  <select id="ev-cat" className={`input${errors.categoryId ? ' error' : ''}`}
-                    value={form.categoryId} onChange={e => setForm(p => ({ ...p, categoryId: e.target.value }))}>
+                  <label className="label" htmlFor="ev-cat">
+                    Category <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <select
+                    id="ev-cat"
+                    className={`input${errors.categoryId ? ' error' : ''}`}
+                    value={form.categoryId}
+                    onChange={e => handleFieldChange('categoryId', e.target.value)}
+                    onBlur={() => handleFieldBlur('categoryId')}
+                  >
                     <option value="">Select category</option>
-                    {categories.map((c: Category) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {categories.map((c: Category) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
                   </select>
-                  {errors.categoryId && <p className="error-text">{errors.categoryId}</p>}
+                  {errors.categoryId && (
+                    <p className="error-text">
+                      <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                      <span>{errors.categoryId}</span>
+                    </p>
+                  )}
                 </div>
+
                 <div>
-                  <label className="label" htmlFor="ev-venue">Venue *</label>
-                  <select id="ev-venue" className={`input${errors.venueId ? ' error' : ''}`}
-                    value={form.venueId} onChange={e => setForm(p => ({ ...p, venueId: e.target.value }))}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label className="label" htmlFor="ev-venue">
+                      Venue <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    {selectedVenue && (
+                      <span style={{ fontSize: 11, color: '#34d399', fontWeight: 600 }}>
+                        Cap: {selectedVenue.capacity.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <select
+                    id="ev-venue"
+                    className={`input${errors.venueId ? ' error' : ''}`}
+                    value={form.venueId}
+                    onChange={e => handleFieldChange('venueId', e.target.value)}
+                    onBlur={() => handleFieldBlur('venueId')}
+                  >
                     <option value="">Select venue</option>
-                    {venueList.map((v: Venue) => <option key={v.id} value={v.id}>{v.name}, {v.city}</option>)}
+                    {venueList.map((v: Venue) => (
+                      <option key={v.id} value={v.id}>{v.name}, {v.city} ({v.capacity.toLocaleString()} cap)</option>
+                    ))}
                   </select>
-                  {errors.venueId && <p className="error-text">{errors.venueId}</p>}
+                  {errors.venueId && (
+                    <p className="error-text">
+                      <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                      <span>{errors.venueId}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="label" htmlFor="ev-datetime">Date & Time *</label>
-                <input id="ev-datetime" type="datetime-local" className={`input${errors.dateTime ? ' error' : ''}`}
-                  value={form.dateTime} onChange={e => setForm(p => ({ ...p, dateTime: e.target.value }))} />
-                {errors.dateTime && <p className="error-text">{errors.dateTime}</p>}
+                <label className="label" htmlFor="ev-datetime">
+                  Date & Time <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  id="ev-datetime"
+                  type="datetime-local"
+                  min={minDateTime}
+                  className={`input${errors.dateTime ? ' error' : ''}`}
+                  value={form.dateTime}
+                  onChange={e => handleFieldChange('dateTime', e.target.value)}
+                  onBlur={() => handleFieldBlur('dateTime')}
+                />
+                {errors.dateTime && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.dateTime}</span>
+                  </p>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 14 }}>
                 <div>
-                  <label className="label" htmlFor="ev-price">Price (₹) *</label>
-                  <input id="ev-price" type="number" min="0" className={`input${errors.price ? ' error' : ''}`}
-                    placeholder="0" value={form.price} onChange={e => setForm(p => ({ ...p, price: e.target.value }))} />
-                  {errors.price && <p className="error-text">{errors.price}</p>}
+                  <label className="label" htmlFor="ev-price">
+                    Price (₹) <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <input
+                    id="ev-price"
+                    type="number"
+                    min="0"
+                    step="1"
+                    className={`input${errors.price ? ' error' : ''}`}
+                    placeholder="0"
+                    value={form.price}
+                    onChange={e => handleFieldChange('price', e.target.value)}
+                    onBlur={() => handleFieldBlur('price')}
+                  />
+                  {errors.price && (
+                    <p className="error-text">
+                      <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                      <span>{errors.price}</span>
+                    </p>
+                  )}
                 </div>
+
                 <div>
-                  <label className="label" htmlFor="ev-seats">Total Seats *</label>
-                  <input id="ev-seats" type="number" min="1" className={`input${errors.totalSeats ? ' error' : ''}`}
-                    placeholder="100" value={form.totalSeats} onChange={e => setForm(p => ({ ...p, totalSeats: e.target.value }))} />
-                  {errors.totalSeats && <p className="error-text">{errors.totalSeats}</p>}
+                  <label className="label" htmlFor="ev-seats">
+                    Total Seats <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <input
+                    id="ev-seats"
+                    type="number"
+                    min="1"
+                    step="1"
+                    className={`input${errors.totalSeats ? ' error' : ''}`}
+                    placeholder="100"
+                    value={form.totalSeats}
+                    onChange={e => handleFieldChange('totalSeats', e.target.value)}
+                    onBlur={() => handleFieldBlur('totalSeats')}
+                  />
+                  {errors.totalSeats && (
+                    <p className="error-text">
+                      <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                      <span>{errors.totalSeats}</span>
+                    </p>
+                  )}
                 </div>
+
                 <div>
                   <label className="label" htmlFor="ev-status">Status</label>
-                  <select id="ev-status" className="input" value={form.status} onChange={e => setForm(p => ({ ...p, status: e.target.value }))}>
+                  <select
+                    id="ev-status"
+                    className="input"
+                    value={form.status}
+                    onChange={e => handleFieldChange('status', e.target.value)}
+                  >
                     <option value="ACTIVE">Active</option>
                     <option value="CANCELLED">Cancelled</option>
                     <option value="COMPLETED">Completed</option>
@@ -358,18 +647,73 @@ export default function AdminEventsPage() {
                 </div>
               </div>
 
+              {/* Optional Cover Image URL */}
+              <div>
+                <label className="label" htmlFor="ev-image">
+                  <HiPhoto style={{ color: '#10b981' }} />
+                  <span>Cover Image URL (optional)</span>
+                </label>
+                <input
+                  id="ev-image"
+                  type="url"
+                  className={`input${errors.imageUrl ? ' error' : ''}`}
+                  placeholder="https://images.unsplash.com/photo-..."
+                  value={form.imageUrl}
+                  onChange={e => handleFieldChange('imageUrl', e.target.value)}
+                  onBlur={() => handleFieldBlur('imageUrl')}
+                />
+                {errors.imageUrl && (
+                  <p className="error-text">
+                    <HiExclamationCircle style={{ fontSize: 14, flexShrink: 0 }} />
+                    <span>{errors.imageUrl}</span>
+                  </p>
+                )}
+                {form.imageUrl && !errors.imageUrl && (
+                  <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img
+                      src={form.imageUrl}
+                      alt="Event Preview"
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                      style={{ width: 64, height: 44, borderRadius: 6, objectFit: 'cover', border: '1px solid rgba(16,185,129,0.3)' }}
+                    />
+                    <span style={{ fontSize: 12, color: '#34d399' }}>Image preview loaded</span>
+                  </div>
+                )}
+              </div>
+
               {saveMutation.isError && (
-                <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#e11d48', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  borderRadius: 10,
+                  padding: '10px 14px',
+                  fontSize: 13,
+                  color: '#f87171',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}>
                   <HiExclamationTriangle style={{ fontSize: 18, flexShrink: 0 }} />
-                  <span>{(axios.isAxiosError(saveMutation.error) && (saveMutation.error.response?.data as { message?: string })?.message) || 'Failed to save. Try again.'}</span>
+                  <span>{(axios.isAxiosError(saveMutation.error) && (saveMutation.error.response?.data as { message?: string })?.message) || 'Failed to save event. Please check inputs and try again.'}</span>
                 </div>
               )}
 
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                <button id="btn-save-event" type="submit" className="btn btn-primary" disabled={saveMutation.isPending}>
+                <button
+                  id="btn-save-event"
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={saveMutation.isPending}
+                >
                   {saveMutation.isPending ? 'Saving…' : editEvent ? 'Save Changes' : 'Create Event'}
                 </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
