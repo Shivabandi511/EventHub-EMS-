@@ -20,6 +20,7 @@ import {
 } from 'react-icons/hi2';
 import { eventService, type Event } from '../services/eventService';
 import CustomerLayout from '../layouts/CustomerLayout';
+import { useCity } from '../context/CityContext';
 import { getEventImage, getCategoryFallback } from '../assets/images';
 
 const CATEGORY_ICON: Record<string, React.ReactElement> = {
@@ -110,17 +111,23 @@ function EventCard({ event }: { event: Event }) {
 
 export default function EventListingPage() {
   const [searchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get('search') ?? '');
-  const [selectedCity, setSelectedCity] = useState(searchParams.get('city') ?? '');
+  const { selectedCity, setSelectedCity, searchQuery } = useCity();
+  const [search, setSearch] = useState(searchParams.get('search') ?? searchQuery);
   const [sort, setSort] = useState(searchParams.get('sort') ?? 'dateTime');
   const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    if (searchQuery !== undefined) {
+      setSearch(searchQuery);
+    }
+  }, [searchQuery]);
 
   const queryParams = {
     ...(search && { search }),
     ...(selectedCity && { city: selectedCity }),
     sort,
     page,
-    size: 6, // 6 events per page ensures multi-page pagination across our 18 events
+    size: 6, // 6 events per page ensures multi-page pagination across our events
   };
 
   const { data, isLoading, isError } = useQuery({

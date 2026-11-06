@@ -2,6 +2,8 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
+import { CityProvider } from './context/CityContext';
+import CitySelectorModal from './components/CitySelectorModal';
 import { ProtectedRoute, GuestRoute } from './routes/ProtectedRoute';
 
 // Public pages loaded eagerly or lazily
@@ -53,9 +55,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
+        <CityProvider>
+          <BrowserRouter>
+            <CitySelectorModal />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
               {/* Public routes */}
               <Route path="/"           element={<HomePage />} />
               <Route path="/events"     element={<EventListingPage />} />
@@ -90,6 +94,7 @@ export default function App() {
             </Routes>
           </Suspense>
         </BrowserRouter>
+        </CityProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

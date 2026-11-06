@@ -1,311 +1,565 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { 
   HiTicket, 
-  HiCalendar, 
-  HiMapPin, 
-  HiArrowRight, 
-  HiExclamationTriangle, 
-  HiArrowPath,
-  HiMagnifyingGlass,
-  HiFunnel,
-  HiChevronLeft,
-  HiChevronRight
+  HiMagnifyingGlass, 
+  HiArrowDownTray,
+  HiPaperAirplane,
+  HiShare,
+  HiEye,
+  HiSquares2X2,
+  HiListBullet,
+  HiCalendarDays,
+  HiArrowRight
 } from 'react-icons/hi2';
 import { bookingService, type Booking } from '../services/bookingService';
-import type { PagedResponse } from '../services/eventService';
-import CustomerLayout from '../layouts/CustomerLayout';
+import AccountLayout from '../layouts/AccountLayout';
 import { getEventImage, getCategoryFallback } from '../assets/images';
 
-const STATUS_FILTERS = [
-  { id: 'ALL', label: 'All Bookings' },
-  { id: 'CONFIRMED', label: 'Confirmed' },
-  { id: 'PENDING', label: 'Pending' },
-  { id: 'CANCELLED', label: 'Cancelled' },
-];
-
-function BookingCard({ booking }: { booking: Booking }) {
-  const eventDate = booking.event?.dateTime ? new Date(booking.event.dateTime) : null;
-  const bookDate = booking.bookingDate ? new Date(booking.bookingDate) : new Date();
-
-  const statusMap: Record<string, { label: string; cls: string }> = {
-    CONFIRMED: { label: 'Confirmed', cls: 'badge-green' },
-    CANCELLED: { label: 'Cancelled', cls: 'badge-rose' },
-    PENDING:   { label: 'Pending',   cls: 'badge-amber' },
-  };
-  const s = statusMap[booking.status] ?? { label: booking.status, cls: 'badge-purple' };
-  const [imgSrc, setImgSrc] = useState(getEventImage(booking.event?.imageUrl, booking.event?.title));
-
-  return (
-    <div className="booking-card-item">
-      {/* Event Thumb / Icon */}
-      <div style={{ width: 84, height: 84, borderRadius: 14, overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
-        <img
-          src={imgSrc}
-          alt={booking.event?.title ?? 'Event'}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          onError={() => setImgSrc(getCategoryFallback(booking.event?.title))}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(16, 185, 129, 0.15)' }} />
-      </div>
-
-      {/* Info Body */}
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
-          <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f8fafc' }}>
-            {booking.event?.title ?? 'Event Booking'}
-          </h3>
-          <span className={`badge ${s.cls}`}>{s.label}</span>
-        </div>
-
-        {eventDate && !isNaN(eventDate.getTime()) && (
-          <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <HiCalendar style={{ color: '#34d399', flexShrink: 0 }} />
-            <span>
-              {eventDate.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })} · {eventDate.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}
-            </span>
-          </p>
-        )}
-
-        {booking.event?.venue && (
-          <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <HiMapPin style={{ color: '#22d3ee', flexShrink: 0 }} />
-            <span>{booking.event.venue.name}{booking.event.venue.city ? `, ${booking.event.venue.city}` : ''}</span>
-          </p>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <span style={{ fontSize: 13, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <HiTicket style={{ color: '#34d399' }} />
-              {booking.ticketCount} ticket{booking.ticketCount > 1 ? 's' : ''}
-            </span>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#34d399' }}>
-              {booking.totalAmount === 0 ? 'Free' : `₹${booking.totalAmount?.toLocaleString('en-IN')}`}
-            </span>
-          </div>
-
-          <Link to={`/my-bookings/${booking.id}`} className="btn btn-secondary btn-sm">
-            <span>View Details</span>
-            <HiArrowRight style={{ fontSize: 14 }} />
-          </Link>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border-subtle)', fontSize: 11, color: '#94a3b8' }}>
-          <span>Ref: <strong style={{ color: '#34d399' }}>#EH{String(booking.id).padStart(6, '0')}</strong></span>
-          <span>Booked on {!isNaN(bookDate.getTime()) ? bookDate.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : 'Recently'}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
+type TabType = 'ONGOING' | 'NEEDS_ACTION' | 'PAST' | 'ALL';
 
 export default function MyBookingsPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('ALL');
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const [activeTab, setActiveTab] = useState<TabType>('ONGOING');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['my-bookings'],
     queryFn: () => bookingService.getMyBookings(),
   });
 
-  const raw = data?.data;
-  const allBookings: Booking[] = useMemo(() => {
-    if (Array.isArray(raw)) {
-      return raw;
-    }
-    if (raw && typeof raw === 'object' && 'content' in raw && Array.isArray((raw as PagedResponse<Booking>).content)) {
-      return (raw as PagedResponse<Booking>).content;
-    }
-    return [];
-  }, [raw]);
+  const bookings: Booking[] = useMemo(() => data?.data ?? [], [data?.data]);
 
-  // Filtering
+  const now = new Date();
+
+  // Filter bookings based on activeTab and searchQuery
   const filteredBookings = useMemo(() => {
-    return allBookings.filter(b => {
-      // Status filter
-      if (selectedStatus !== 'ALL' && b.status !== selectedStatus) {
-        return false;
+    return bookings.filter(b => {
+      // Search filter
+      const q = searchQuery.toLowerCase().trim();
+      const title = b.event?.title?.toLowerCase() ?? '';
+      const regNo = `#EH${String(b.id).padStart(6, '0')}`.toLowerCase();
+      const matchesSearch = !q || title.includes(q) || regNo.includes(q);
+      if (!matchesSearch) return false;
+
+      const eventDate = b.event?.dateTime ? new Date(b.event.dateTime) : null;
+
+      if (activeTab === 'ONGOING') {
+        // Event date is in future or today, and not cancelled
+        return b.status !== 'CANCELLED' && (!eventDate || eventDate >= now);
       }
-      // Search filter (by title, venue, or ref ID)
-      if (searchTerm.trim()) {
-        const query = searchTerm.toLowerCase();
-        const titleMatch = b.event?.title?.toLowerCase().includes(query);
-        const venueMatch = b.event?.venue?.name?.toLowerCase().includes(query) || b.event?.venue?.city?.toLowerCase().includes(query);
-        const refMatch = String(b.id).includes(query) || `#EH${String(b.id).padStart(6, '0')}`.toLowerCase().includes(query);
-        if (!titleMatch && !venueMatch && !refMatch) return false;
+      if (activeTab === 'NEEDS_ACTION') {
+        return b.status === 'PENDING';
       }
-      return true;
+      if (activeTab === 'PAST') {
+        return b.status === 'CANCELLED' || (eventDate && eventDate < now);
+      }
+      return true; // 'ALL'
     });
-  }, [allBookings, selectedStatus, searchTerm]);
+  }, [bookings, activeTab, searchQuery, now]);
 
-  // Pagination calculation
-  const totalPages = Math.ceil(filteredBookings.length / pageSize) || 1;
-  const paginatedBookings = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredBookings.slice(start, start + pageSize);
-  }, [filteredBookings, currentPage, pageSize]);
-
-  const handleStatusChange = (status: string) => {
-    setSelectedStatus(status);
-    setCurrentPage(1);
+  const handleDownloadTicket = (b: Booking) => {
+    alert(`Downloading e-Ticket for registration #301${String(b.id).padStart(4, '0')} (${b.event?.title})`);
   };
 
-  const handleSearchChange = (val: string) => {
-    setSearchTerm(val);
-    setCurrentPage(1);
+  const handleShareBooking = (b: Booking) => {
+    if (navigator.share) {
+      navigator.share({
+        title: b.event?.title,
+        text: `I'm attending ${b.event?.title}!`,
+        url: window.location.origin + `/events/${b.event?.id}`,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.origin + `/events/${b.event?.id}`);
+      alert('Event link copied to clipboard!');
+    }
   };
 
   return (
-    <CustomerLayout>
-      <div className="container-app page-container" style={{ maxWidth: 860 }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 14 }}>
-          <div>
-            <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1e1b4b', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div className="booking-icon-box">
-                <HiTicket />
-              </div>
-              <span>My Bookings</span>
-            </h1>
-            <p style={{ color: '#6b7280', fontSize: 15, marginTop: 4 }}>
-              {isLoading ? 'Loading your reservations…' : `Showing ${filteredBookings.length} of ${allBookings.length} total bookings`}
-            </p>
+    <AccountLayout activeTab="bookings">
+      {/* ── Page Header ── */}
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>
+          My Bookings
+        </h1>
+        <p style={{ fontSize: 13.5, color: '#64748B' }}>
+          Your purchased tickets and registrations.
+        </p>
+      </div>
+
+      {/* ── Controls Row (Tabs + Search + View toggle) ── */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 16,
+        marginBottom: 20
+      }}>
+        {/* Filter Tabs (Ongoing & upcoming, Needs action, Past, All) */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          background: '#F1F5F9',
+          padding: '4px',
+          borderRadius: 9999,
+          gap: 4
+        }}>
+          {[
+            { id: 'ONGOING', label: 'Ongoing & upcoming' },
+            { id: 'NEEDS_ACTION', label: 'Needs action' },
+            { id: 'PAST', label: 'Past' },
+            { id: 'ALL', label: 'All' },
+          ].map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id as TabType)}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: 9999,
+                  border: 'none',
+                  fontSize: 13,
+                  fontWeight: isActive ? 600 : 500,
+                  background: isActive ? '#FFFFFF' : 'transparent',
+                  color: isActive ? '#0F172A' : '#64748B',
+                  boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right: Search + View Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Search bookings */}
+          <div style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            background: '#FFFFFF',
+            border: '1.5px solid #E2E8F0',
+            borderRadius: 8,
+            padding: '7px 12px',
+            width: 220
+          }}>
+            <HiMagnifyingGlass style={{ color: '#94A3B8', fontSize: 16, marginRight: 8, flexShrink: 0 }} />
+            <input
+              type="text"
+              placeholder="Search bookings"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontSize: 13,
+                color: '#0F172A',
+                width: '100%'
+              }}
+            />
           </div>
 
-          <button onClick={() => refetch()} className="btn btn-secondary btn-sm">
-            <HiArrowPath style={{ fontSize: 14 }} />
-            <span>Refresh</span>
+          {/* Grid/List switch */}
+          <div style={{
+            display: 'inline-flex',
+            background: '#FFFFFF',
+            border: '1.5px solid #E2E8F0',
+            borderRadius: 8,
+            padding: 2
+          }}>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              style={{
+                background: viewMode === 'grid' ? '#F1F5F9' : 'transparent',
+                color: viewMode === 'grid' ? '#0F172A' : '#94A3B8',
+                border: 'none',
+                borderRadius: 6,
+                padding: '6px 8px',
+                cursor: 'pointer',
+                display: 'flex'
+              }}
+              title="Grid view"
+            >
+              <HiSquares2X2 style={{ fontSize: 16 }} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              style={{
+                background: viewMode === 'list' ? '#F1F5F9' : 'transparent',
+                color: viewMode === 'list' ? '#0F172A' : '#94A3B8',
+                border: 'none',
+                borderRadius: 6,
+                padding: '6px 8px',
+                cursor: 'pointer',
+                display: 'flex'
+              }}
+              title="Table / List view"
+            >
+              <HiListBullet style={{ fontSize: 16 }} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Content View ── */}
+      {isLoading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
+          <div className="spinner" style={{ width: 40, height: 40 }} />
+        </div>
+      ) : isError ? (
+        <div style={{
+          background: '#FFFFFF',
+          borderRadius: 16,
+          border: '1px solid #E2E8F0',
+          padding: 40,
+          textAlign: 'center'
+        }}>
+          <p style={{ color: '#EF4444', fontSize: 15, marginBottom: 16 }}>Failed to load bookings</p>
+          <button
+            onClick={() => refetch()}
+            style={{
+              padding: '8px 20px',
+              borderRadius: 8,
+              border: 'none',
+              background: '#10B981',
+              color: '#FFFFFF',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Retry
           </button>
         </div>
-
-        {/* Filter Bar */}
-        <div className="filter-card" style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            {/* Search Input */}
-            <div style={{ position: 'relative', flex: '1 1 260px' }}>
-              <input
-                type="text"
-                className="input"
-                placeholder="Search booking title or ref #…"
-                value={searchTerm}
-                onChange={e => handleSearchChange(e.target.value)}
-                style={{ paddingLeft: 38 }}
-              />
-              <HiMagnifyingGlass style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: 18 }} />
-            </div>
-
-            {/* Status Chips */}
-            <div className="filter-chips-row" style={{ margin: 0 }}>
-              {STATUS_FILTERS.map(f => (
-                <button
-                  key={f.id}
-                  onClick={() => handleStatusChange(f.id)}
-                  className={`filter-chip ${selectedStatus === f.id ? 'active' : ''}`}
-                >
-                  <HiFunnel style={{ fontSize: 13 }} />
-                  <span>{f.label}</span>
-                </button>
-              ))}
-            </div>
+      ) : filteredBookings.length === 0 ? (
+        /* Empty State */
+        <div style={{
+          background: '#FFFFFF',
+          borderRadius: 16,
+          border: '1px solid #E2E8F0',
+          padding: '60px 24px',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: 60,
+            height: 60,
+            borderRadius: '50%',
+            background: '#ECFDF5',
+            color: '#10B981',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px',
+            fontSize: 28
+          }}>
+            <HiTicket />
           </div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginBottom: 6 }}>
+            No bookings found
+          </h3>
+          <p style={{ fontSize: 13.5, color: '#64748B', maxWidth: 380, margin: '0 auto 20px' }}>
+            {searchQuery
+              ? `No bookings match "${searchQuery}". Try a different keyword.`
+              : 'You do not have any bookings in this tab yet. Explore trending events and get your tickets!'}
+          </p>
+          <Link
+            to="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 24px',
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, #10B981, #059669)',
+              color: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: 13.5,
+              textDecoration: 'none',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+            }}
+          >
+            <span>Explore Events</span>
+            <HiArrowRight style={{ fontSize: 14 }} />
+          </Link>
         </div>
+      ) : viewMode === 'list' ? (
+        /* ── MeraEvents Bookings Table (Matching Image 8) ── */
+        <div style={{
+          background: '#FFFFFF',
+          borderRadius: 16,
+          border: '1px solid #E2E8F0',
+          overflowX: 'auto',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
+        }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 840 }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
+                <th style={{ padding: '14px 20px', fontSize: 12, fontWeight: 600, color: '#64748B' }}>Event</th>
+                <th style={{ padding: '14px 16px', fontSize: 12, fontWeight: 600, color: '#64748B' }}>Event date</th>
+                <th style={{ padding: '14px 16px', fontSize: 12, fontWeight: 600, color: '#64748B' }}>Venue</th>
+                <th style={{ padding: '14px 16px', fontSize: 12, fontWeight: 600, color: '#64748B' }}>Booked on</th>
+                <th style={{ padding: '14px 12px', fontSize: 12, fontWeight: 600, color: '#64748B', textAlign: 'center' }}>Qty</th>
+                <th style={{ padding: '14px 16px', fontSize: 12, fontWeight: 600, color: '#64748B' }}>Reg no.</th>
+                <th style={{ padding: '14px 16px', fontSize: 12, fontWeight: 600, color: '#64748B' }}>Status</th>
+                <th style={{ padding: '14px 20px', fontSize: 12, fontWeight: 600, color: '#64748B', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredBookings.map((b) => {
+                const eventDate = b.event?.dateTime ? new Date(b.event.dateTime) : null;
+                const bookDate = b.bookingDate ? new Date(b.bookingDate) : new Date();
+                const regNo = `#301${String(b.id).padStart(4, '0')}`;
+                const isFree = b.totalAmount === 0;
 
-        {/* Booking List / States */}
-        {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-            <div className="spinner" style={{ width: 44, height: 44 }} />
-          </div>
-        ) : isError ? (
-          <div className="state-box" style={{ background: '#fff1f2', borderColor: '#fecdd3' }}>
-            <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-              <HiExclamationTriangle />
-            </div>
-            <h3 style={{ color: '#be123c', fontWeight: 700, marginBottom: 6 }}>Failed to load bookings</h3>
-            <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 16 }}>
-              {axios.isAxiosError(error)
-                ? (error.response?.data?.message || error.message)
-                : error instanceof Error
-                ? error.message
-                : 'Please check backend server connection.'}
-            </p>
-            <button onClick={() => refetch()} className="btn btn-primary btn-sm">Try Again</button>
-          </div>
-        ) : filteredBookings.length === 0 ? (
-          <div className="state-box">
-            <div className="state-icon">
-              <HiTicket />
-            </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1e1b4b', marginBottom: 8 }}>
-              {allBookings.length === 0 ? 'No bookings yet' : 'No matching bookings found'}
-            </h3>
-            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 20 }}>
-              {allBookings.length === 0
-                ? "You haven't reserved tickets for any events. Start exploring now!"
-                : 'Try clearing your search term or selecting a different status filter.'}
-            </p>
-            {allBookings.length === 0 ? (
-              <Link to="/events" className="btn btn-primary btn-md">
-                <span>Browse Events</span>
-                <HiArrowRight />
-              </Link>
-            ) : (
-              <button onClick={() => { setSearchTerm(''); setSelectedStatus('ALL'); }} className="btn btn-secondary btn-sm">
-                Reset Filters
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {paginatedBookings.map(b => (
-                <BookingCard key={b.id} booking={b} />
-              ))}
-            </div>
+                return (
+                  <tr key={b.id} style={{ borderBottom: '1px solid #F8FAFC', transition: 'background 0.15s' }}>
+                    {/* Event thumbnail + title */}
+                    <td style={{ padding: '14px 20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, maxWidth: 300 }}>
+                        <div style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 8,
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                          background: '#0F172A'
+                        }}>
+                          <img
+                            src={getEventImage(b.event?.imageUrl, b.event?.title)}
+                            alt={b.event?.title ?? 'Event'}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = getCategoryFallback(b.event?.title);
+                            }}
+                          />
+                        </div>
+                        <Link
+                          to={`/events/${b.event?.id}`}
+                          style={{
+                            fontSize: 13.5,
+                            fontWeight: 700,
+                            color: '#0F172A',
+                            textDecoration: 'none',
+                            lineHeight: 1.35,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {b.event?.title ?? 'Event Booking'}
+                        </Link>
+                      </div>
+                    </td>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="pagination-container">
-                <button
-                  className="pagination-btn"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                >
-                  <HiChevronLeft />
-                  <span>Prev</span>
-                </button>
+                    {/* Event date */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      {eventDate ? (
+                        <>
+                          <p style={{ fontSize: 13, color: '#0F172A', fontWeight: 500, marginBottom: 2 }}>
+                            {eventDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                          <p style={{ fontSize: 11.5, color: '#64748B' }}>
+                            {eventDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </>
+                      ) : (
+                        <span style={{ fontSize: 13, color: '#94A3B8' }}>—</span>
+                      )}
+                    </td>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
-                  <button
-                    key={pageNum}
-                    className={`pagination-btn ${pageNum === currentPage ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                ))}
+                    {/* Venue */}
+                    <td style={{ padding: '14px 16px', fontSize: 13, color: '#475569', maxWidth: 160 }}>
+                      <span style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}>
+                        {b.event?.venue?.name || '—'}
+                      </span>
+                    </td>
 
-                <button
-                  className="pagination-btn"
-                  disabled={currentPage >= totalPages}
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                >
-                  <span>Next</span>
-                  <HiChevronRight />
-                </button>
+                    {/* Booked on */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: 13, color: '#0F172A', fontWeight: 500, marginBottom: 2 }}>
+                        {bookDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                      <p style={{ fontSize: 11.5, color: '#64748B' }}>
+                        {bookDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </td>
 
-                <span className="pagination-info">
-                  Page {currentPage} of {totalPages}
-                </span>
+                    {/* Qty */}
+                    <td style={{ padding: '14px 12px', fontSize: 13.5, fontWeight: 600, color: '#0F172A', textAlign: 'center' }}>
+                      {b.ticketCount}
+                    </td>
+
+                    {/* Reg no */}
+                    <td style={{ padding: '14px 16px', fontSize: 12.5, color: '#475569', fontFamily: 'monospace' }}>
+                      {regNo}
+                    </td>
+
+                    {/* Status Pill */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        padding: '3px 10px',
+                        borderRadius: 9999,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        background: b.status === 'CANCELLED' ? '#FEF2F2' : '#ECFDF5',
+                        color: b.status === 'CANCELLED' ? '#DC2626' : '#059669',
+                        border: `1px solid ${b.status === 'CANCELLED' ? '#FECACA' : '#A7F3D0'}`
+                      }}>
+                        <span style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          background: b.status === 'CANCELLED' ? '#DC2626' : '#10B981'
+                        }} />
+                        <span>{isFree ? 'Free' : b.status === 'CONFIRMED' ? 'Confirmed' : b.status}</span>
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadTicket(b)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: '#64748B',
+                            padding: 6,
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                          title="Download ticket"
+                        >
+                          <HiArrowDownTray style={{ fontSize: 16 }} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleShareBooking(b)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: '#64748B',
+                            padding: 6,
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                          title="Share event"
+                        >
+                          <HiPaperAirplane style={{ fontSize: 15 }} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleShareBooking(b)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: '#64748B',
+                            padding: 6,
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                          title="Share link"
+                        >
+                          <HiShare style={{ fontSize: 15 }} />
+                        </button>
+
+                        <Link
+                          to={`/my-bookings/${b.id}`}
+                          style={{
+                            color: '#10B981',
+                            padding: 6,
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                          title="View booking details"
+                        >
+                          <HiEye style={{ fontSize: 16 }} />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        /* ── Grid View ── */
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 20
+        }}>
+          {filteredBookings.map(b => {
+            const eventDate = b.event?.dateTime ? new Date(b.event.dateTime) : null;
+            return (
+              <div
+                key={b.id}
+                style={{
+                  background: '#FFFFFF',
+                  borderRadius: 14,
+                  border: '1px solid #E2E8F0',
+                  padding: 16,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12
+                }}
+              >
+                <div style={{ height: 140, borderRadius: 10, overflow: 'hidden' }}>
+                  <img
+                    src={getEventImage(b.event?.imageUrl, b.event?.title)}
+                    alt={b.event?.title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>
+                  {b.event?.title}
+                </h3>
+                {eventDate && (
+                  <p style={{ fontSize: 12.5, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <HiCalendarDays style={{ color: '#10B981', fontSize: 16 }} />
+                    <span>{eventDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  </p>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: 8, borderTop: '1px solid #F1F5F9' }}>
+                  <span style={{ fontSize: 12, color: '#64748B' }}>Qty: <strong>{b.ticketCount}</strong></span>
+                  <Link to={`/my-bookings/${b.id}`} style={{ fontSize: 12.5, fontWeight: 600, color: '#10B981', textDecoration: 'none' }}>
+                    View Details →
+                  </Link>
+                </div>
               </div>
-            )}
-          </>
-        )}
-      </div>
-    </CustomerLayout>
+            );
+          })}
+        </div>
+      )}
+    </AccountLayout>
   );
 }

@@ -141,23 +141,10 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <label className="label" htmlFor="login-password" style={{ marginBottom: 0 }}>
-                  <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />
-                  <span>Password</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setShowForgotModal(true)}
-                  style={{
-                    background: 'none', border: 'none',
-                    color: '#34d399', fontSize: 12, fontWeight: 600,
-                    cursor: 'pointer', padding: 0, textDecoration: 'none'
-                  }}
-                >
-                  Forgot password?
-                </button>
-              </div>
+              <label className="label" htmlFor="login-password">
+                <HiLockClosed style={{ fontSize: 14, color: '#10b981' }} />
+                <span>Password</span>
+              </label>
               <div style={{ position: 'relative' }}>
                 <input
                   id="login-password"
@@ -193,6 +180,27 @@ export default function LoginPage() {
                   {showPassword ? <HiEyeSlash style={{ fontSize: 18 }} /> : <HiEye style={{ fontSize: 18 }} />}
                 </button>
               </div>
+
+              {/* Forgot password positioned DOWN of the password field */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(true)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#34d399',
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: 0,
+                    textDecoration: 'none'
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+
               {errors.password && <p className="error-text">{errors.password}</p>}
             </div>
 
