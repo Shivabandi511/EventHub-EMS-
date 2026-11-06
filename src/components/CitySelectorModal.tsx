@@ -4,7 +4,8 @@ import {
   HiXMark, 
   HiMagnifyingGlass, 
   HiGlobeAlt,
-  HiCheck
+  HiCheck,
+  HiArrowPath
 } from 'react-icons/hi2';
 import { useCity } from '../context/CityContext';
 
@@ -165,10 +166,84 @@ const OTHER_POPULAR_CITIES = [
   'Raipur', 'Surat', 'Thiruvananthapuram', 'Visakhapatnam'
 ];
 
+const CITY_COORDINATES: { name: string; lat: number; lng: number }[] = [
+  { name: 'Hyderabad', lat: 17.3850, lng: 78.4867 },
+  { name: 'Bengaluru', lat: 12.9716, lng: 77.5946 },
+  { name: 'Mumbai', lat: 19.0760, lng: 72.8777 },
+  { name: 'New Delhi', lat: 28.6139, lng: 77.2090 },
+  { name: 'Ahmedabad', lat: 23.0225, lng: 72.5714 },
+  { name: 'Pune', lat: 18.5204, lng: 73.8567 },
+  { name: 'Chennai', lat: 13.0827, lng: 80.2707 },
+  { name: 'Kolkata', lat: 22.5726, lng: 88.3639 },
+  { name: 'Jaipur', lat: 26.9124, lng: 75.7873 },
+  { name: 'Lucknow', lat: 26.8467, lng: 80.9462 },
+  { name: 'Chandigarh', lat: 30.7333, lng: 76.7794 },
+  { name: 'Bhopal', lat: 23.2599, lng: 77.4126 },
+  { name: 'Indore', lat: 22.7196, lng: 75.8577 },
+  { name: 'Kochi', lat: 9.9312, lng: 76.2673 },
+  { name: 'Visakhapatnam', lat: 17.6868, lng: 83.2185 },
+  { name: 'Coimbatore', lat: 11.0168, lng: 76.9558 },
+  { name: 'Nagpur', lat: 21.1458, lng: 79.0882 },
+  { name: 'Surat', lat: 21.1702, lng: 72.8311 },
+  { name: 'Dehradun', lat: 30.3165, lng: 78.0322 },
+  { name: 'Bhubaneswar', lat: 20.2961, lng: 85.8245 },
+  { name: 'Goa', lat: 15.2993, lng: 74.1240 },
+  { name: 'Guwahati', lat: 26.1445, lng: 91.7362 },
+  { name: 'Mysuru', lat: 12.2958, lng: 76.6394 },
+  { name: 'Noida', lat: 28.5355, lng: 77.3910 },
+  { name: 'Gurugram', lat: 28.4595, lng: 77.0266 },
+  { name: 'Raipur', lat: 21.2514, lng: 81.6296 },
+  { name: 'Thiruvananthapuram', lat: 8.5241, lng: 76.9366 }
+];
+
+function findNearestCity(lat: number, lng: number): string {
+  let closest = 'Hyderabad';
+  let minDistance = Infinity;
+
+  for (const city of CITY_COORDINATES) {
+    const dLat = (city.lat - lat) * (Math.PI / 180);
+    const dLng = (city.lng - lng) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat * (Math.PI / 180)) *
+        Math.cos(city.lat * (Math.PI / 180)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = 6371 * c; // Distance in km
+
+    if (d < minDistance) {
+      minDistance = d;
+      closest = city.name;
+    }
+  }
+
+  return closest;
+}
+
+function matchKnownCity(cityName = ''): string | null {
+  if (!cityName) return null;
+  const cn = cityName.toLowerCase().trim();
+  if (cn.includes('bangalore') || cn.includes('bengaluru')) return 'Bengaluru';
+  if (cn.includes('hyderabad') || cn.includes('secunderabad')) return 'Hyderabad';
+  if (cn.includes('mumbai') || cn.includes('bombay') || cn.includes('thane') || cn.includes('navi mumbai')) return 'Mumbai';
+  if (cn.includes('delhi') || cn.includes('noida') || cn.includes('gurgaon') || cn.includes('gurugram')) return 'New Delhi';
+  if (cn.includes('pune')) return 'Pune';
+  if (cn.includes('chennai') || cn.includes('madras')) return 'Chennai';
+  if (cn.includes('kolkata') || cn.includes('calcutta')) return 'Kolkata';
+  if (cn.includes('ahmedabad')) return 'Ahmedabad';
+
+  const found = OTHER_POPULAR_CITIES.find(c => cn.includes(c.toLowerCase()));
+  if (found) return found;
+
+  return null;
+}
+
 export default function CitySelectorModal() {
   const { selectedCity, setSelectedCity, isCityModalOpen, closeCityModal } = useCity();
   const [filterText, setFilterText] = useState('');
   const [detecting, setDetecting] = useState(false);
+  const [detectStatus, setDetectStatus] = useState<string | null>(null);
 
   const filteredMajorCities = useMemo(() => {
     if (!filterText.trim()) return MAJOR_CITIES;
@@ -189,24 +264,112 @@ export default function CitySelectorModal() {
     closeCityModal();
   };
 
+  const fetchIpLocation = async (): Promise<string | null> => {
+    // 1. Try geojs.io (Fast, HTTPS, CORS, no key required)
+    try {
+      const res = await fetch('https://get.geojs.io/v1/ip/geo.json');
+      if (res.ok) {
+        const data = await res.json();
+        const matched = matchKnownCity(data.city || data.region);
+        if (matched) return matched;
+        const lat = parseFloat(data.latitude);
+        const lng = parseFloat(data.longitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          return findNearestCity(lat, lng);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // 2. Try ipapi.co
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      if (res.ok) {
+        const data = await res.json();
+        const matched = matchKnownCity(data.city || data.region);
+        if (matched) return matched;
+        if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+          return findNearestCity(data.latitude, data.longitude);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // 3. Try bigdatacloud reverse-geocode-client
+    try {
+      const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client');
+      if (res.ok) {
+        const data = await res.json();
+        const matched = matchKnownCity(data.city || data.locality || data.principalSubdivision);
+        if (matched) return matched;
+        if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+          return findNearestCity(data.latitude, data.longitude);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    return null;
+  };
+
+  const reverseGeocodeCoords = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const res = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const matched = matchKnownCity(data.city || data.locality || data.principalSubdivision);
+        if (matched) return matched;
+      }
+    } catch {
+      // fallback to closest distance
+    }
+    return findNearestCity(lat, lng);
+  };
+
   const handleDetectLocation = () => {
     setDetecting(true);
+    setDetectStatus('Detecting your location...');
+
+    let finished = false;
+    const finishWithCity = (city: string) => {
+      if (finished) return;
+      finished = true;
+      setDetectStatus(`Detected: ${city}`);
+      setTimeout(() => {
+        setDetecting(false);
+        setDetectStatus(null);
+        handleSelect(city);
+      }, 500);
+    };
+
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        () => {
-          // In local environment or default, detect Hyderabad
-          setDetecting(false);
-          handleSelect('Hyderabad');
+        async (position) => {
+          try {
+            const detected = await reverseGeocodeCoords(
+              position.coords.latitude,
+              position.coords.longitude
+            );
+            finishWithCity(detected);
+          } catch {
+            const ipCity = await fetchIpLocation();
+            finishWithCity(ipCity || 'Hyderabad');
+          }
         },
-        () => {
-          setDetecting(false);
-          handleSelect('Hyderabad');
+        async () => {
+          // Geolocation permission denied, prompt dismissed, or timed out -> use IP geolocation
+          const ipCity = await fetchIpLocation();
+          finishWithCity(ipCity || 'Hyderabad');
         },
-        { timeout: 3000 }
+        { timeout: 4000, maximumAge: 60000, enableHighAccuracy: false }
       );
     } else {
-      setDetecting(false);
-      handleSelect('Hyderabad');
+      fetchIpLocation().then(city => finishWithCity(city || 'Hyderabad'));
     }
   };
 
@@ -342,12 +505,17 @@ export default function CitySelectorModal() {
               border: 'none',
               fontWeight: 600,
               fontSize: 13,
-              cursor: 'pointer',
+              cursor: detecting ? 'wait' : 'pointer',
               boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
-              transition: 'background 0.2s'
+              transition: 'all 0.2s ease',
+              opacity: detecting ? 0.85 : 1
             }}
           >
-            <HiMapPin style={{ fontSize: 16 }} />
+            {detecting ? (
+              <HiArrowPath style={{ fontSize: 16, animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <HiMapPin style={{ fontSize: 16 }} />
+            )}
             <span>{detecting ? 'Detecting…' : 'Detect location'}</span>
           </button>
 
@@ -374,6 +542,26 @@ export default function CitySelectorModal() {
             <span>All Cities</span>
           </button>
         </div>
+
+        {detectStatus && (
+          <div style={{
+            margin: '-12px 0 20px 0',
+            padding: '8px 14px',
+            background: '#ECFDF5',
+            border: '1px solid #A7F3D0',
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#065F46',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            animation: 'fadeIn 0.2s ease-in'
+          }}>
+            <HiMapPin style={{ fontSize: 15, color: '#10B981', flexShrink: 0 }} />
+            <span>{detectStatus}</span>
+          </div>
+        )}
 
         {/* 8 Major Cities Grid */}
         {filteredMajorCities.length > 0 && (

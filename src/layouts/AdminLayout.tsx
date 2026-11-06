@@ -37,7 +37,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => {
+    setUserDropdownOpen(false);
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

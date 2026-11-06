@@ -35,8 +35,9 @@ export default function AccountLayout({ children, activeTab }: AccountLayoutProp
   }, []);
 
   const handleLogout = () => {
+    setDropdownOpen(false);
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';

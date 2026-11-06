@@ -21,7 +21,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('eh_token');
       localStorage.removeItem('eh_user');
-      window.location.href = '/login';
+      const path = window.location.pathname;
+      if (path.startsWith('/admin') || path.startsWith('/profile') || path.startsWith('/my-bookings')) {
+        window.location.href = '/';
+      }
     }
     return Promise.reject(error);
   }

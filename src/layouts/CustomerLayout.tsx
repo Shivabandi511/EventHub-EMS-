@@ -39,9 +39,11 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   }, []);
 
   const handleLogout = () => {
-    logout();
     setUserDropdownOpen(false);
-    navigate('/login');
+    logout();
+    if (location.pathname !== '/' && location.pathname !== '/events' && !location.pathname.startsWith('/events/')) {
+      navigate('/');
+    }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
