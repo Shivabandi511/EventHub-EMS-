@@ -1,15 +1,17 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useRef, useEffect, type ReactNode } from 'react';
-import { 
-  HiChartBar, 
-  HiCalendarDays, 
-  HiTag, 
-  HiMapPin, 
-  HiTicket, 
-  HiBolt, 
+import {
+  HiChartBar,
+  HiCalendarDays,
+  HiTag,
+  HiMapPin,
+  HiTicket,
+  HiBolt,
   HiUser,
-  HiArrowRightOnRectangle, 
+  HiUsers,
+  HiShieldCheck,
+  HiArrowRightOnRectangle,
   HiArrowTopRightOnSquare,
   HiBars3,
   HiXMark
@@ -19,6 +21,7 @@ interface NavItem {
   to: string;
   icon: React.ReactElement;
   label: string;
+  superAdminOnly?: boolean;
 }
 
 const sidebarLinks: NavItem[] = [
@@ -27,15 +30,18 @@ const sidebarLinks: NavItem[] = [
   { to: '/admin/events',     icon: <HiCalendarDays style={{ fontSize: 18 }} />, label: 'Events' },
   { to: '/admin/categories', icon: <HiTag style={{ fontSize: 18 }} />, label: 'Categories' },
   { to: '/admin/bookings',   icon: <HiTicket style={{ fontSize: 18 }} />, label: 'Bookings' },
+  { to: '/admin/users',      icon: <HiUsers style={{ fontSize: 18 }} />, label: 'Manage Admins', superAdminOnly: true },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, isSuperAdmin, logout } = useAuth();
   const location = useLocation();
   const navigate  = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const visibleLinks = sidebarLinks.filter(l => !l.superAdminOnly || isSuperAdmin);
 
   const handleLogout = () => {
     setUserDropdownOpen(false);
@@ -57,7 +63,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     path === '/admin' ? location.pathname === '/admin' : location.pathname.startsWith(path);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg-midnight)', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', background: '#F8FAFC', color: '#0F172A', position: 'relative' }}>
       {/* ── Mobile Sidebar Overlay ── */}
       <div
         className={`admin-sidebar-overlay ${sidebarOpen ? 'open' : ''}`}
@@ -68,37 +74,58 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside
         className={`admin-sidebar-drawer ${sidebarOpen ? 'open' : ''}`}
         style={{
-          width: 250, flexShrink: 0,
-          background: 'var(--bg-deep-navy)',
-          borderRight: '1px solid var(--border-subtle)',
+          width: 256, flexShrink: 0,
+          background: '#FFFFFF',
+          borderRight: '1px solid #E2E8F0',
           display: 'flex', flexDirection: 'column',
           position: 'sticky', top: 0, height: '100vh',
           overflowY: 'auto',
+          boxShadow: '2px 0 12px rgba(15, 23, 42, 0.03)',
         }}
       >
-        {/* Logo */}
-        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Logo & Role Badge */}
+        <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,
-                background: 'linear-gradient(135deg, #10b981, #0d9488)',
+                background: 'linear-gradient(135deg, #10B981, #059669)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 18, color: '#ffffff',
-                boxShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
               }}>
                 <HiBolt />
               </div>
-              <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 19, color: '#f8fafc' }}>
-                Event<span className="gradient-text">Hub</span>
+              <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, fontSize: 20, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                Event<span style={{ color: '#10B981' }}>Hub</span>
               </span>
             </Link>
+            <div style={{ marginTop: 10 }}>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                padding: '3px 10px',
+                borderRadius: 9999,
+                background: isSuperAdmin ? '#ECFDF5' : '#F0FDF4',
+                color: '#059669',
+                border: '1px solid #A7F3D0',
+                textTransform: 'uppercase',
+              }}>
+                <HiShieldCheck style={{ fontSize: 13 }} />
+                <span>{isSuperAdmin ? 'Super Admin' : 'Event Admin'}</span>
+              </span>
+            </div>
           </div>
+
           {/* Close button on mobile */}
           <button
             onClick={() => setSidebarOpen(false)}
             className="show-mobile"
-            style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 22, cursor: 'pointer', padding: 4 }}
+            style={{ background: 'none', border: 'none', color: '#64748B', fontSize: 22, cursor: 'pointer', padding: 4 }}
             aria-label="Close Sidebar"
           >
             <HiXMark />
@@ -107,7 +134,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
         {/* Nav links */}
         <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {sidebarLinks.map(({ to, icon, label }) => (
+          {visibleLinks.map(({ to, icon, label }) => (
             <Link
               key={to}
               to={to}
@@ -119,19 +146,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </Link>
           ))}
 
-          <div style={{ borderTop: '1px solid var(--border-subtle)', margin: '14px 0 8px' }} />
+          <div style={{ borderTop: '1px solid #F1F5F9', margin: '14px 0 8px' }} />
 
-          <Link to="/" className="sidebar-link" style={{ color: '#94a3b8' }} onClick={() => setSidebarOpen(false)}>
+          <Link to="/" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
             <HiArrowTopRightOnSquare style={{ fontSize: 18 }} />
             <span>Customer View</span>
           </Link>
         </nav>
 
         {/* User info + logout */}
-        <div style={{ padding: '16px 14px', borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ padding: '12px 14px', borderRadius: 10, background: 'var(--bg-midnight)', border: '1px solid var(--border-subtle)', marginBottom: 12 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>{user?.name}</p>
-            <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{user?.email}</p>
+        <div style={{ padding: '16px 14px', borderTop: '1px solid #F1F5F9' }}>
+          <div style={{ padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0', marginBottom: 10 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', margin: 0 }}>{user?.name}</p>
+            <p style={{ fontSize: 11.5, color: '#64748B', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</p>
           </div>
           <button className="btn btn-secondary btn-sm" style={{ width: '100%' }} onClick={handleLogout}>
             <HiArrowRightOnRectangle style={{ fontSize: 16 }} />
@@ -141,15 +168,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Main content ── */}
-      <div className="admin-main-wrap" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'auto' }}>
+      <div className="admin-main-wrap" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'auto', background: '#F8FAFC' }}>
         {/* Top bar */}
         <header style={{
-          minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          minHeight: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 clamp(16px, 3vw, 32px)',
-          borderBottom: '1px solid var(--border-subtle)',
-          background: 'rgba(6, 18, 14, 0.90)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid #E2E8F0',
+          background: 'rgba(255, 255, 255, 0.92)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
           position: 'sticky', top: 0, zIndex: 40,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -157,10 +184,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               onClick={() => setSidebarOpen(true)}
               className="show-mobile"
               style={{
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid var(--border-subtle)',
+                background: '#ECFDF5',
+                border: '1px solid #A7F3D0',
                 borderRadius: 8,
-                color: '#f8fafc',
+                color: '#059669',
                 cursor: 'pointer',
                 padding: '6px 8px',
                 fontSize: 20,
@@ -172,12 +199,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             >
               <HiBars3 />
             </button>
-            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#f8fafc' }}>
-              {sidebarLinks.find(l => isActive(l.to))?.label ?? 'Dashboard'}
+            <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 18, fontWeight: 700, color: '#0F172A' }}>
+              {visibleLinks.find(l => isActive(l.to))?.label ?? 'Dashboard'}
             </h2>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }} className="hidden-mobile">
+            <span style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }} className="hidden-mobile">
               Welcome, {user?.name?.split(' ')[0]}
             </span>
 
@@ -221,7 +248,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   background: '#FFFFFF',
                   borderRadius: 14,
                   border: '1px solid #E2E8F0',
-                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.15)',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.12)',
                   zIndex: 100,
                   overflow: 'hidden',
                   animation: 'modalPopIn 0.2s ease-out'

@@ -82,12 +82,12 @@ export default function AdminBookingsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
               <HiTicket style={{ color: '#10b981' }} />
               <span>Booking Management</span>
             </h1>
-            <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 4 }}>
-              {allBookings.length} total bookings recorded in platform
+            <p style={{ color: '#64748B', fontSize: 14, marginTop: 4 }}>
+              {allBookings.length} total bookings recorded
             </p>
           </div>
         </div>
@@ -150,30 +150,30 @@ export default function AdminBookingsPage() {
                 <tbody>
                   {pagedList.map((bk: Booking) => (
                     <tr key={bk.id}>
-                      <td style={{ fontFamily: 'monospace', color: '#22d3ee', fontWeight: 700, fontSize: 13 }}>
+                      <td style={{ fontFamily: 'monospace', color: '#059669', fontWeight: 700, fontSize: 13 }}>
                         #EH{String(bk.id).padStart(6, '0')}
                       </td>
                       <td>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', marginBottom: 2 }}>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>
                           {bk.event?.title ?? '—'}
                         </p>
-                        <p style={{ fontSize: 11, color: '#94a3b8' }}>
+                        <p style={{ fontSize: 11.5, color: '#64748B' }}>
                           {bk.event?.venue?.city ? `📍 ${bk.event.venue.city}` : ''}
                         </p>
                       </td>
                       <td>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#f8fafc', marginBottom: 2 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', marginBottom: 2 }}>
                           {bk.user?.name ?? '—'}
                         </p>
-                        <span style={{ fontSize: 11, color: '#94a3b8' }}>{bk.user?.email}</span>
+                        <span style={{ fontSize: 11.5, color: '#64748B' }}>{bk.user?.email}</span>
                       </td>
-                      <td style={{ fontWeight: 600, color: '#f8fafc' }}>
+                      <td style={{ fontWeight: 600, color: '#0F172A' }}>
                         {bk.ticketCount}
                       </td>
-                      <td style={{ fontWeight: 800, color: '#22d3ee', fontSize: 14 }}>
+                      <td style={{ fontWeight: 800, color: '#059669', fontSize: 14 }}>
                         {bk.totalAmount === 0 ? 'Free' : `₹${bk.totalAmount?.toLocaleString('en-IN')}`}
                       </td>
-                      <td style={{ fontSize: 12, color: '#94a3b8' }}>
+                      <td style={{ fontSize: 12, color: '#64748B' }}>
                         {bk.bookingDate ? new Date(bk.bookingDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—'}
                       </td>
                       <td>

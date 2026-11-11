@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import api from '../services/api';
 
 // ========================================================
 // 1. DATA TYPES
@@ -10,7 +11,7 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
-  role: 'CUSTOMER' | 'ADMIN';
+  role: 'CUSTOMER' | 'ADMIN' | 'SUPER_ADMIN';
 }
 
 /** Everything the AuthContext provides to the rest of the application */
@@ -19,6 +20,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -63,7 +65,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Helper booleans
   const isAuthenticated = Boolean(token && user);
-  const isAdmin = user?.role === 'ADMIN';
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+
+  // Sync latest role/profile when app loads with an existing token
+  useEffect(() => {
+    if (!token) return;
+    let active = true;
+    api.get<User>('/users/me')
+      .then((res) => {
+        if (!active || !res.data) return;
+        localStorage.setItem('eh_user', JSON.stringify(res.data));
+        setUser(res.data);
+      })
+      .catch(() => {
+        // Ignore transient network errors; 401 is handled by interceptor
+      });
+    return () => { active = false; };
+  }, [token]);
 
   // Function called when the user successfully signs in
   const login = (newToken: string, newUser: User) => {
@@ -94,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token,
         isAuthenticated,
         isAdmin,
+        isSuperAdmin,
         login,
         logout,
         updateUser,

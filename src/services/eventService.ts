@@ -12,6 +12,9 @@ export interface Event {
   availableSeats: number;
   status: 'ACTIVE' | 'CANCELLED' | 'COMPLETED';
   imageUrl?: string;
+  createdById?: number;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 export interface EventFilters {
@@ -51,8 +54,10 @@ export interface Category { id: number; name: string; description?: string; stat
 export interface Venue    { id: number; name: string; address: string; city: string; capacity: number; }
 
 export const eventService = {
-  getEvents:   (params?: EventFilters) => api.get<PagedResponse<Event>>('/events', { params }),
-  getEvent:    (id: number)             => api.get<Event>(`/events/${id}`),
+  getEvents:        (params?: EventFilters) => api.get<PagedResponse<Event>>('/events', { params }),
+  getMyAdminEvents: (params?: { page?: number; size?: number; sort?: string }) =>
+    api.get<PagedResponse<Event>>('/events/my', { params }),
+  getEvent:         (id: number)             => api.get<Event>(`/events/${id}`),
   createEvent: (data: EventPayload)     => api.post<Event>('/events', data),
   updateEvent: (id: number, data: EventPayload) => api.put<Event>(`/events/${id}`, data),
   deleteEvent: (id: number)             => api.delete(`/events/${id}`),

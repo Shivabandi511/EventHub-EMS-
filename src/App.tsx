@@ -26,6 +26,7 @@ const AdminEventsPage         = lazy(() => import('./pages/admin/AdminEventsPage
 const AdminCategoriesPage     = lazy(() => import('./pages/admin/AdminCategoriesPage'));
 const AdminVenuesPage         = lazy(() => import('./pages/admin/AdminVenuesPage'));
 const AdminBookingsPage       = lazy(() => import('./pages/admin/AdminBookingsPage'));
+const AdminUsersPage          = lazy(() => import('./pages/admin/AdminUsersPage'));
 const NotFoundPage            = lazy(() => import('./pages/NotFoundPage'));
 
 const queryClient = new QueryClient({
@@ -80,13 +81,18 @@ export default function App() {
                 <Route path="/profile"                       element={<ProfilePage />} />
               </Route>
 
-              {/* Admin-only routes */}
+              {/* Admin & Super Admin routes */}
               <Route element={<ProtectedRoute adminOnly />}>
                 <Route path="/admin"             element={<AdminDashboard />} />
                 <Route path="/admin/events"      element={<AdminEventsPage />} />
                 <Route path="/admin/categories"  element={<AdminCategoriesPage />} />
                 <Route path="/admin/venues"      element={<AdminVenuesPage />} />
                 <Route path="/admin/bookings"    element={<AdminBookingsPage />} />
+              </Route>
+
+              {/* Super Admin only routes */}
+              <Route element={<ProtectedRoute superAdminOnly />}>
+                <Route path="/admin/users"       element={<AdminUsersPage />} />
               </Route>
 
               {/* 404 */}

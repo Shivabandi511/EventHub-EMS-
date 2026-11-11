@@ -141,10 +141,10 @@ export default function RegisterPage() {
           }}>
             <HiTicket />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', marginBottom: 6 }}>
             Create an account
           </h1>
-          <p style={{ fontSize: 14, color: '#94a3b8' }}>Join EventHub and start exploring events</p>
+          <p style={{ fontSize: 14, color: '#64748B' }}>Join EventHub and start exploring events</p>
         </div>
 
         {/* Card */}
@@ -178,9 +178,9 @@ export default function RegisterPage() {
 
           <div className="divider" />
 
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#64748B' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#34d399', fontWeight: 600, textDecoration: 'none' }}>
+            <Link to="/login" style={{ color: '#059669', fontWeight: 600, textDecoration: 'none' }}>
               Sign in
             </Link>
           </p>

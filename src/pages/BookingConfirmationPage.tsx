@@ -43,26 +43,26 @@ export default function BookingConfirmationPage() {
           }}>
             <HiCheckCircle />
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#f8fafc', marginBottom: 8 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#0F172A', marginBottom: 8 }}>
             Booking Confirmed!
           </h1>
-          <p style={{ color: '#94a3b8', fontSize: 16 }}>
+          <p style={{ color: '#64748B', fontSize: 16 }}>
             Your tickets are reserved. We have saved your confirmation.
           </p>
         </div>
 
         {booking ? (
-          <div className="glass-card" style={{ padding: 32, marginBottom: 24, boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)' }}>
+          <div className="glass-card" style={{ padding: 32, marginBottom: 24 }}>
             {/* Reference Badge */}
             <div style={{
-              background: 'rgba(16, 185, 129, 0.15)', border: '1.5px solid rgba(16, 185, 129, 0.4)',
+              background: '#ECFDF5', border: '1.5px solid #A7F3D0',
               borderRadius: 14, padding: '16px 20px', marginBottom: 24, textAlign: 'center',
             }}>
-              <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <HiTicket style={{ color: '#34d399' }} />
+              <p style={{ fontSize: 12, color: '#64748B', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <HiTicket style={{ color: '#10B981' }} />
                 <span>Booking Reference</span>
               </p>
-              <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 900, color: '#34d399', letterSpacing: 2 }}>
+              <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 900, color: '#059669', letterSpacing: 2 }}>
                 #EH{String(booking.id).padStart(6, '0')}
               </p>
             </div>
@@ -70,22 +70,22 @@ export default function BookingConfirmationPage() {
             {/* Event info */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Event Title</p>
-                <p style={{ fontSize: 20, fontWeight: 700, color: '#f8fafc' }}>{booking.event?.title}</p>
+                <p style={{ fontSize: 12, color: '#64748B', marginBottom: 4 }}>Event Title</p>
+                <p style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>{booking.event?.title}</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
                 {[
-                  { icon: <HiCalendar style={{ color: '#34d399' }} />, label: 'Date & Time', value: booking.event?.dateTime ? new Date(booking.event.dateTime).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—' },
-                  { icon: <HiMapPin style={{ color: '#22d3ee' }} />, label: 'Venue',       value: booking.event?.venue ? `${booking.event.venue.name}, ${booking.event.venue.city}` : '—' },
-                  { icon: <HiTicket style={{ color: '#34d399' }} />, label: 'Tickets',     value: `${booking.ticketCount} ticket${booking.ticketCount > 1 ? 's' : ''}` },
-                  { icon: <span style={{ color: '#22d3ee', fontWeight: 800 }}>₹</span>, label: 'Total Paid',  value: booking.totalAmount === 0 ? 'Free' : `₹${booking.totalAmount?.toLocaleString('en-IN')}` },
+                  { icon: <HiCalendar style={{ color: '#10B981' }} />, label: 'Date & Time', value: booking.event?.dateTime ? new Date(booking.event.dateTime).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—' },
+                  { icon: <HiMapPin style={{ color: '#10B981' }} />, label: 'Venue',       value: booking.event?.venue ? `${booking.event.venue.name}, ${booking.event.venue.city}` : '—' },
+                  { icon: <HiTicket style={{ color: '#10B981' }} />, label: 'Tickets',     value: `${booking.ticketCount} ticket${booking.ticketCount > 1 ? 's' : ''}` },
+                  { icon: <span style={{ color: '#059669', fontWeight: 800 }}>₹</span>, label: 'Total Paid',  value: booking.totalAmount === 0 ? 'Free' : `₹${booking.totalAmount?.toLocaleString('en-IN')}` },
                 ].map(({ icon, label, value }) => (
-                  <div key={label} style={{ background: 'var(--bg-midnight)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: '14px 16px' }}>
-                    <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div key={label} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px' }}>
+                    <p style={{ fontSize: 11, color: '#64748B', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
                       {icon}
                       <span>{label}</span>
                     </p>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>{value}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{value}</p>
                   </div>
                 ))}
               </div>

@@ -16,10 +16,10 @@ export default function NotFoundPage() {
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           marginBottom: 16,
         }}>404</div>
-        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 12 }}>
+        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 28, fontWeight: 800, color: '#0F172A', marginBottom: 12 }}>
           Page Not Found
         </h1>
-        <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 360, margin: '0 auto 36px', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 16, color: '#64748B', maxWidth: 360, margin: '0 auto 36px', lineHeight: 1.7 }}>
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>

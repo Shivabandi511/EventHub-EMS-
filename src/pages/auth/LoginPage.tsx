@@ -50,7 +50,8 @@ export default function LoginPage() {
     try {
       const res = await authService.login(form);
       login(res.data.token, res.data.user);
-      navigate(res.data.user.role === 'ADMIN' ? '/admin' : '/');
+      const isAdminRole = res.data.user.role === 'ADMIN' || res.data.user.role === 'SUPER_ADMIN';
+      navigate(isAdminRole ? '/admin' : '/');
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setApiError((err.response?.data as { message?: string })?.message ?? 'Invalid credentials. Please try again.');
@@ -105,10 +106,10 @@ export default function LoginPage() {
           }}>
             <HiBolt />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 6 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', marginBottom: 6 }}>
             Welcome back
           </h1>
-          <p style={{ fontSize: 14, color: '#94a3b8' }}>Sign in to your EventHub account</p>
+          <p style={{ fontSize: 14, color: '#64748B' }}>Sign in to your EventHub account</p>
         </div>
 
         {/* Card */}
@@ -189,7 +190,7 @@ export default function LoginPage() {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#34d399',
+                    color: '#059669',
                     fontSize: 12.5,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -215,9 +216,9 @@ export default function LoginPage() {
 
           <div className="divider" />
 
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#64748B' }}>
             Don't have an account?{' '}
-            <Link to="/register" style={{ color: '#34d399', fontWeight: 600, textDecoration: 'none' }}>
+            <Link to="/register" style={{ color: '#059669', fontWeight: 600, textDecoration: 'none' }}>
               Create one
             </Link>
           </p>
@@ -229,13 +230,13 @@ export default function LoginPage() {
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && closeForgotModal()}>
           <div className="modal-box" style={{ maxWidth: 440 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <HiLockClosed style={{ color: '#10b981' }} />
                 <span>Reset Password</span>
               </h2>
               <button
                 onClick={closeForgotModal}
-                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22 }}
+                style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontSize: 22 }}
                 aria-label="Close modal"
               >
                 <HiXMark />
@@ -246,18 +247,18 @@ export default function LoginPage() {
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
                 <div style={{
                   width: 54, height: 54, borderRadius: '50%',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28, color: '#34d399', margin: '0 auto 16px'
+                  fontSize: 28, color: '#10B981', margin: '0 auto 16px'
                 }}>
                   <HiCheckCircle />
                 </div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f8fafc', marginBottom: 8 }}>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0F172A', marginBottom: 8 }}>
                   Password Reset Link Sent!
                 </h3>
-                <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, marginBottom: 24 }}>
-                  We've sent instructions to <strong style={{ color: '#34d399' }}>{forgotEmail}</strong>. Please check your inbox and spam folder.
+                <p style={{ fontSize: 14, color: '#64748B', lineHeight: 1.6, marginBottom: 24 }}>
+                  We've sent instructions to <strong style={{ color: '#059669' }}>{forgotEmail}</strong>. Please check your inbox and spam folder.
                 </p>
                 <button
                   className="btn btn-primary btn-md"

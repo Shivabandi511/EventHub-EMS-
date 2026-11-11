@@ -19,7 +19,7 @@ import {
 } from 'react-icons/hi2';
 
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, isSuperAdmin, logout } = useAuth();
   const { selectedCity, openCityModal, searchQuery, setSearchQuery } = useCity();
   const location = useLocation();
   const navigate = useNavigate();
@@ -300,7 +300,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
                           <HiShieldCheck style={{ fontSize: 16, color: '#10B981' }} />
-                          <span>Admin Portal</span>
+                          <span>{isSuperAdmin ? 'Super Admin Portal' : 'Admin Portal'}</span>
                         </Link>
                       )}
 

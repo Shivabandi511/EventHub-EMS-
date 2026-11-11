@@ -76,22 +76,22 @@ function EventCard({ event }: { event: Event }) {
       </div>
 
       <div style={{ padding: '18px 20px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f8fafc', marginBottom: 8, lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0F172A', marginBottom: 8, lineHeight: 1.3 }}>
           {event.title}
         </h3>
-        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <HiCalendar style={{ color: '#34d399', flexShrink: 0 }} />
+        <p style={{ fontSize: 13, color: '#64748B', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <HiCalendar style={{ color: '#10B981', flexShrink: 0 }} />
           <span>
             {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </p>
-        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <HiMapPin style={{ color: '#22d3ee', flexShrink: 0 }} />
+        <p style={{ fontSize: 13, color: '#64748B', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <HiMapPin style={{ color: '#10B981', flexShrink: 0 }} />
           <span>{event.venue?.name}, {event.venue?.city}</span>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 14, borderTop: '1px solid rgba(16, 185, 129, 0.2)' }}>
-          <span style={{ fontSize: 19, fontWeight: 800, color: '#34d399' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 14, borderTop: '1px solid #E2E8F0' }}>
+          <span style={{ fontSize: 19, fontWeight: 800, color: '#059669' }}>
             {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
           </span>
           <button
@@ -158,11 +158,11 @@ export default function EventListingPage() {
           gap: 16
         }}>
           <div>
-            <h1 style={{ fontSize: 'clamp(26px, 4vw, 34px)', fontWeight: 800, color: '#f8fafc', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <HiCalendar style={{ color: '#22d3ee' }} />
+            <h1 style={{ fontSize: 'clamp(26px, 4vw, 34px)', fontWeight: 800, color: '#0F172A', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HiCalendar style={{ color: '#10B981' }} />
               <span>Discover Events</span>
             </h1>
-            <p style={{ color: '#94a3b8', fontSize: 15 }}>
+            <p style={{ color: '#64748B', fontSize: 15 }}>
               {isLoading
                 ? 'Loading events…'
                 : selectedCity
@@ -237,10 +237,10 @@ export default function EventListingPage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 7,
-                  background: isSelected ? 'linear-gradient(135deg, #10B981 0%, #0D9488 100%)' : 'rgba(13, 30, 24, 0.85)',
-                  color: isSelected ? '#ffffff' : '#94a3b8',
-                  border: isSelected ? '1px solid #10B981' : '1px solid var(--border-subtle)',
-                  boxShadow: isSelected ? '0 4px 16px rgba(16, 185, 129, 0.4)' : 'none',
+                  background: isSelected ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : '#FFFFFF',
+                  color: isSelected ? '#ffffff' : '#475569',
+                  border: isSelected ? '1px solid #10B981' : '1px solid #E2E8F0',
+                  boxShadow: isSelected ? '0 4px 14px rgba(16, 185, 129, 0.28)' : 'none',
                   transition: 'all 0.2s ease',
                 }}
               >
@@ -251,8 +251,8 @@ export default function EventListingPage() {
                     fontSize: 11,
                     padding: '2px 7px',
                     borderRadius: 999,
-                    background: isSelected ? 'rgba(255,255,255,0.22)' : 'rgba(16, 185, 129, 0.15)',
-                    color: isSelected ? '#ffffff' : '#34d399',
+                    background: isSelected ? 'rgba(255,255,255,0.22)' : '#ECFDF5',
+                    color: isSelected ? '#ffffff' : '#059669',
                     fontWeight: 800
                   }}>
                     {city.short}
@@ -282,10 +282,10 @@ export default function EventListingPage() {
               <div className="state-icon">
                 <HiMapPin />
               </div>
-              <h3 style={{ fontSize: 20, color: '#f8fafc', marginBottom: 8 }}>
+              <h3 style={{ fontSize: 20, color: '#0F172A', marginBottom: 8 }}>
                 No events found {selectedCity ? `in ${selectedCity}` : ''}
               </h3>
-              <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 20 }}>
+              <p style={{ fontSize: 14, color: '#64748B', marginBottom: 20 }}>
                 Try selecting "All Locations" or search with a different keyword.
               </p>
               <button

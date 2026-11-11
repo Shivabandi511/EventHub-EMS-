@@ -159,11 +159,11 @@ export default function AdminVenuesPage() {
       <div className="page-container" style={{ maxWidth: 960, padding: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
               <HiMapPin style={{ color: '#10b981' }} />
               <span>Venue Management</span>
             </h1>
-            <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 4 }}>{venues.length} venues registered</p>
+            <p style={{ color: '#64748B', fontSize: 14, marginTop: 4 }}>{venues.length} venues registered</p>
           </div>
           <button id="btn-create-venue" className="btn btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <HiPlus />
@@ -194,10 +194,10 @@ export default function AdminVenuesPage() {
                 <tbody>
                   {venues.map((v: Venue) => (
                     <tr key={v.id}>
-                      <td style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>{v.name}</td>
-                      <td style={{ fontSize: 13, color: '#22d3ee', fontWeight: 600 }}>{v.city}</td>
-                      <td style={{ fontSize: 13, color: '#94a3b8' }}>{v.address}</td>
-                      <td style={{ fontSize: 13, color: '#34d399', fontWeight: 700 }}>{v.capacity?.toLocaleString('en-IN')} seats</td>
+                      <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{v.name}</td>
+                      <td style={{ fontSize: 13, color: '#059669', fontWeight: 600 }}>{v.city}</td>
+                      <td style={{ fontSize: 13, color: '#64748B' }}>{v.address}</td>
+                      <td style={{ fontSize: 13, color: '#059669', fontWeight: 700 }}>{v.capacity?.toLocaleString('en-IN')} seats</td>
                       <td>
                         <div style={{ display: 'flex', gap: 8 }}>
                           <button className="btn btn-secondary btn-sm" onClick={() => openEdit(v)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -223,7 +223,7 @@ export default function AdminVenuesPage() {
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div className="modal-box" style={{ maxWidth: 480 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
                 {editItem ? <><HiPencilSquare style={{ color: '#10b981' }} /> Edit Venue</> : <><HiPlus style={{ color: '#10b981' }} /> Add Venue</>}
               </h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
@@ -350,8 +350,8 @@ export default function AdminVenuesPage() {
             <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
               <HiTrash />
             </div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#f8fafc', marginBottom: 10 }}>Delete Venue?</h3>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>This action cannot be undone.</p>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0F172A', marginBottom: 10 }}>Delete Venue?</h3>
+            <p style={{ fontSize: 14, color: '#64748B', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(deleteConfirm!)}>
                 {deleteMutation.isPending ? 'Deleting…' : 'Yes, Delete'}

@@ -105,15 +105,15 @@ export default function BookingPage() {
     <CustomerLayout>
       <div className="container-app page-container">
         {/* Breadcrumb */}
-        <nav style={{ marginBottom: 28, fontSize: 13, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Link to="/events" style={{ color: '#94a3b8', textDecoration: 'none' }}>Events</Link>
+        <nav style={{ marginBottom: 28, fontSize: 13, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Link to="/events" style={{ color: '#64748B', textDecoration: 'none' }}>Events</Link>
           <span>/</span>
-          <Link to={`/events/${eventId}`} style={{ color: '#94a3b8', textDecoration: 'none' }}>{event.title}</Link>
+          <Link to={`/events/${eventId}`} style={{ color: '#64748B', textDecoration: 'none' }}>{event.title}</Link>
           <span>/</span>
-          <span style={{ color: '#22d3ee', fontWeight: 600 }}>Book Tickets</span>
+          <span style={{ color: '#059669', fontWeight: 600 }}>Book Tickets</span>
         </nav>
 
-        <h1 style={{ fontSize: 30, fontWeight: 800, color: '#f8fafc', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <h1 style={{ fontSize: 30, fontWeight: 800, color: '#0F172A', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div className="booking-icon-box">
             <HiTicket />
           </div>
@@ -126,7 +126,7 @@ export default function BookingPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Ticket Count */}
               <div className="glass-card" style={{ padding: 24 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#f8fafc', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <HiTicket style={{ color: '#10b981' }} />
                   <span>Number of Tickets</span>
                 </h2>
@@ -135,21 +135,21 @@ export default function BookingPage() {
                     onClick={() => updateTicketCount(Math.max(1, ticketCount - 1))}>
                     <HiMinus />
                   </button>
-                  <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 30, fontWeight: 900, color: '#34d399', minWidth: 44, textAlign: 'center' }}>
+                  <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 30, fontWeight: 900, color: '#059669', minWidth: 44, textAlign: 'center' }}>
                     {ticketCount}
                   </span>
                   <button type="button" className="btn btn-secondary" style={{ width: 42, height: 42, borderRadius: '50%', padding: 0 }}
                     onClick={() => updateTicketCount(Math.min(event.availableSeats, ticketCount + 1))}>
                     <HiPlus />
                   </button>
-                  <span style={{ fontSize: 13, color: '#94a3b8' }}>(max {event.availableSeats} available)</span>
+                  <span style={{ fontSize: 13, color: '#64748B' }}>(max {event.availableSeats} available)</span>
                 </div>
                 {errors.tickets && <p className="error-text" style={{ marginTop: 8 }}>{errors.tickets}</p>}
               </div>
 
               {/* Attendee Details */}
               <div className="glass-card" style={{ padding: 24 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#f8fafc', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <HiUser style={{ color: '#10b981' }} />
                   <span>Attendee Details</span>
                 </h2>
@@ -202,29 +202,29 @@ export default function BookingPage() {
 
             {/* Right: Summary */}
             <div style={{ position: 'sticky', top: 90 }}>
-              <div className="glass-card" style={{ padding: 26, boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)' }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#f8fafc', marginBottom: 20 }}>
+              <div className="glass-card" style={{ padding: 26 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginBottom: 20 }}>
                   Order Summary
                 </h2>
-                <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid var(--border-subtle)' }}>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', marginBottom: 6 }}>{event.title}</p>
-                  <p style={{ fontSize: 13, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <HiCalendar style={{ color: '#34d399' }} />
+                <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #E2E8F0' }}>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', marginBottom: 6 }}>{event.title}</p>
+                  <p style={{ fontSize: 13, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <HiCalendar style={{ color: '#10B981' }} />
                     <span>{new Date(event.dateTime).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}</span>
                   </p>
-                  <p style={{ fontSize: 13, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <HiMapPin style={{ color: '#22d3ee' }} />
+                  <p style={{ fontSize: 13, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <HiMapPin style={{ color: '#10B981' }} />
                     <span>{event.venue?.name}, {event.venue?.city}</span>
                   </p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                    <span style={{ color: '#94a3b8' }}>Price × {ticketCount}</span>
-                    <span style={{ color: '#f8fafc', fontWeight: 600 }}>₹{event.price} × {ticketCount}</span>
+                    <span style={{ color: '#64748B' }}>Price × {ticketCount}</span>
+                    <span style={{ color: '#0F172A', fontWeight: 600 }}>₹{event.price} × {ticketCount}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, paddingTop: 10, borderTop: '1px solid var(--border-subtle)' }}>
-                    <span style={{ color: '#f8fafc', fontWeight: 700 }}>Total Amount</span>
-                    <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 900, color: '#34d399' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, paddingTop: 10, borderTop: '1px solid #E2E8F0' }}>
+                    <span style={{ color: '#0F172A', fontWeight: 700 }}>Total Amount</span>
+                    <span style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 900, color: '#059669' }}>
                       {totalAmount === 0 ? 'Free' : `₹${totalAmount.toLocaleString('en-IN')}`}
                     </span>
                   </div>

@@ -55,14 +55,14 @@ export default function BookingDetailPage() {
   return (
     <CustomerLayout>
       <div className="container-app page-container" style={{ maxWidth: 720 }}>
-        <nav style={{ marginBottom: 24, fontSize: 13, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Link to="/my-bookings" style={{ color: '#94a3b8', textDecoration: 'none' }}>My Bookings</Link>
+        <nav style={{ marginBottom: 24, fontSize: 13, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Link to="/my-bookings" style={{ color: '#64748B', textDecoration: 'none' }}>My Bookings</Link>
           <span>/</span>
-          <span style={{ color: '#22d3ee', fontWeight: 600 }}>Booking Details</span>
+          <span style={{ color: '#059669', fontWeight: 600 }}>Booking Details</span>
         </nav>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
             <HiTicket style={{ color: '#10b981' }} />
             <span>Booking Details</span>
           </h1>
@@ -71,35 +71,35 @@ export default function BookingDetailPage() {
 
         {/* Reference */}
         <div style={{
-          background: 'rgba(16, 185, 129, 0.15)', border: '1.5px solid rgba(16, 185, 129, 0.4)',
+          background: '#ECFDF5', border: '1.5px solid #A7F3D0',
           borderRadius: 14, padding: '18px 24px', marginBottom: 24, textAlign: 'center',
         }}>
-          <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <HiTicket style={{ color: '#34d399' }} />
+          <p style={{ fontSize: 12, color: '#64748B', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <HiTicket style={{ color: '#10B981' }} />
             <span>Booking Reference</span>
           </p>
-          <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 900, color: '#34d399', letterSpacing: 2 }}>
+          <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 900, color: '#059669', letterSpacing: 2 }}>
             #EH{String(booking.id).padStart(6, '0')}
           </p>
         </div>
 
         {/* Event */}
         <div className="glass-card" style={{ padding: 24, marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#34d399', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#059669', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
             <HiInformationCircle style={{ fontSize: 18 }} />
             <span>Event Information</span>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <p style={{ fontSize: 20, fontWeight: 700, color: '#f8fafc' }}>{booking.event?.title}</p>
+            <p style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>{booking.event?.title}</p>
             {booking.event?.dateTime && (
-              <p style={{ fontSize: 14, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <HiCalendar style={{ color: '#34d399' }} />
+              <p style={{ fontSize: 14, color: '#64748B', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <HiCalendar style={{ color: '#10B981' }} />
                 <span>{new Date(booking.event.dateTime).toLocaleString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })}</span>
               </p>
             )}
             {booking.event?.venue && (
-              <p style={{ fontSize: 14, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <HiMapPin style={{ color: '#22d3ee' }} />
+              <p style={{ fontSize: 14, color: '#64748B', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <HiMapPin style={{ color: '#10B981' }} />
                 <span>{booking.event.venue.name}, {booking.event.venue.city}</span>
               </p>
             )}
@@ -108,7 +108,7 @@ export default function BookingDetailPage() {
 
         {/* Ticket summary */}
         <div className="glass-card" style={{ padding: 24, marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#34d399', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#059669', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
             <HiTicket style={{ fontSize: 18 }} />
             <span>Ticket Summary</span>
           </h2>
@@ -119,9 +119,9 @@ export default function BookingDetailPage() {
               { label: 'Total Amount',   value: booking.totalAmount === 0 ? 'Free' : `₹${booking.totalAmount?.toLocaleString('en-IN')}` },
               { label: 'Booked On',      value: booking.bookingDate ? new Date(booking.bookingDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—' },
             ].map(({ label, value }) => (
-              <div key={label} style={{ background: 'var(--bg-midnight)', border: '1px solid var(--border-subtle)', borderRadius: 10, padding: '14px 16px' }}>
-                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{label}</p>
-                <p style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc' }}>{value}</p>
+              <div key={label} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 10, padding: '14px 16px' }}>
+                <p style={{ fontSize: 12, color: '#64748B', marginBottom: 4 }}>{label}</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>{value}</p>
               </div>
             ))}
           </div>
@@ -130,19 +130,19 @@ export default function BookingDetailPage() {
         {/* Attendees */}
         {booking.attendees && booking.attendees.length > 0 && (
           <div className="glass-card" style={{ padding: 24, marginBottom: 28 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#34d399', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#059669', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <HiUser style={{ fontSize: 18 }} />
               <span>Attendees List</span>
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {booking.attendees.map((att, i) => (
-                <div key={i} style={{ background: 'var(--bg-midnight)', border: '1px solid var(--border-subtle)', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 16, alignItems: 'center' }}>
+                <div key={i} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 16, alignItems: 'center' }}>
                   <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg, #10b981, #0d9488)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: 14, flexShrink: 0 }}>
                     {att.name ? att.name.charAt(0).toUpperCase() : 'A'}
                   </div>
                   <div>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>{att.name}</p>
-                    <p style={{ fontSize: 12, color: '#94a3b8' }}>{att.email} · {att.phone}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{att.name}</p>
+                    <p style={{ fontSize: 12, color: '#64748B' }}>{att.email} · {att.phone}</p>
                   </div>
                 </div>
               ))}

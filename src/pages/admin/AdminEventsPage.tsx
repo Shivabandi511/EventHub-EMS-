@@ -18,6 +18,7 @@ import {
   HiPhoto
 } from 'react-icons/hi2';
 import { eventService, categoryService, venueService, type Event, type Category, type Venue } from '../../services/eventService';
+import { useAuth } from '../../context/AuthContext';
 import AdminLayout from '../../layouts/AdminLayout';
 
 interface EventForm {
@@ -45,6 +46,7 @@ const EMPTY_FORM: EventForm = {
 };
 
 export default function AdminEventsPage() {
+  const { isSuperAdmin } = useAuth();
   const qc = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [editEvent, setEditEvent] = useState<Event | null>(null);
@@ -59,7 +61,7 @@ export default function AdminEventsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-events'],
-    queryFn: () => eventService.getEvents({ size: 100 }),
+    queryFn: () => eventService.getMyAdminEvents({ size: 100 }),
     retry: false,
   });
   const { data: cats } = useQuery({ queryKey: ['categories'], queryFn: () => categoryService.getAll(), retry: false });
@@ -278,12 +280,14 @@ export default function AdminEventsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 26, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
               <HiCalendarDays style={{ color: '#10b981' }} />
-              <span>Event Management</span>
+              <span>{isSuperAdmin ? 'All Platform Events' : 'My Events Management'}</span>
             </h1>
-            <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 4 }}>
-              {rawEvents.length} total events organized in platform
+            <p style={{ color: '#64748B', fontSize: 14, marginTop: 4 }}>
+              {isSuperAdmin
+                ? `${rawEvents.length} total events across all admins`
+                : `${rawEvents.length} event${rawEvents.length === 1 ? '' : 's'} created by your admin account`}
             </p>
           </div>
           <button id="btn-create-event" className="btn btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -348,7 +352,16 @@ export default function AdminEventsPage() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    {['Event Name', 'Category', 'Date & Time', 'Price', 'Capacity / Seats', 'Status', 'Actions'].map(h => (
+                    {[
+                      'Event Name',
+                      'Category',
+                      ...(isSuperAdmin ? ['Created By'] : []),
+                      'Date & Time',
+                      'Price',
+                      'Capacity / Seats',
+                      'Status',
+                      'Actions'
+                    ].map(h => (
                       <th key={h}>{h}</th>
                     ))}
                   </tr>
@@ -357,23 +370,33 @@ export default function AdminEventsPage() {
                   {pagedEvents.map((ev: Event) => (
                     <tr key={ev.id}>
                       <td>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', marginBottom: 2 }}>{ev.title}</p>
-                        <p style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <HiMapPin style={{ color: '#22d3ee' }} />
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{ev.title}</p>
+                        <p style={{ fontSize: 12, color: '#64748B', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <HiMapPin style={{ color: '#10B981' }} />
                           <span>{ev.venue?.name}, {ev.venue?.city}</span>
                         </p>
                       </td>
                       <td>
                         <span className="badge badge-purple">{ev.category?.name}</span>
                       </td>
-                      <td style={{ fontSize: 13, color: '#94a3b8' }}>
+                      {isSuperAdmin && (
+                        <td>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', marginBottom: 2 }}>
+                            {ev.createdByName || 'System Admin'}
+                          </p>
+                          {ev.createdByEmail && (
+                            <p style={{ fontSize: 11.5, color: '#64748B' }}>{ev.createdByEmail}</p>
+                          )}
+                        </td>
+                      )}
+                      <td style={{ fontSize: 13, color: '#475569' }}>
                         {new Date(ev.dateTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td style={{ fontSize: 14, fontWeight: 800, color: '#22d3ee' }}>
+                      <td style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>
                         {ev.price === 0 ? 'Free' : `₹${ev.price?.toLocaleString('en-IN')}`}
                       </td>
-                      <td style={{ fontSize: 13, color: '#94a3b8' }}>
-                        <span style={{ fontWeight: 700, color: ev.availableSeats > 0 ? '#34d399' : '#f87171' }}>
+                      <td style={{ fontSize: 13, color: '#64748B' }}>
+                        <span style={{ fontWeight: 700, color: ev.availableSeats > 0 ? '#059669' : '#DC2626' }}>
                           {ev.availableSeats}
                         </span> / {ev.totalSeats} seats
                       </td>
@@ -430,7 +453,7 @@ export default function AdminEventsPage() {
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div className="modal-box" style={{ maxWidth: 620 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
                 {editEvent ? <><HiPencilSquare style={{ color: '#10b981' }} /> Edit Event</> : <><HiPlus style={{ color: '#10b981' }} /> Create Event</>}
               </h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>
@@ -727,8 +750,8 @@ export default function AdminEventsPage() {
             <div style={{ fontSize: 44, color: '#e11d48', marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
               <HiTrash />
             </div>
-            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#f8fafc', marginBottom: 10 }}>Delete Event?</h3>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>This action cannot be undone.</p>
+            <h3 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 20, fontWeight: 700, color: '#0F172A', marginBottom: 10 }}>Delete Event?</h3>
+            <p style={{ fontSize: 14, color: '#64748B', marginBottom: 24 }}>This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button className="btn btn-danger" disabled={deleteMutation.isPending}
                 onClick={() => deleteMutation.mutate(deleteConfirm!)}>

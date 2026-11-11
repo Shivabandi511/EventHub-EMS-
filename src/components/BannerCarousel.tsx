@@ -33,7 +33,7 @@ const BANNERS: BannerSlide[] = [
     badge: "Premier Tech Event",
     date: "10 - 12 Nov 2026 · 10:00 AM",
     venue: "HITEX Exhibition Center, Hyderabad",
-    bgGradient: "linear-gradient(135deg, #1A102F 0%, #5B21B6 50%, #7C3AED 100%)",
+    bgGradient: "linear-gradient(135deg, #064E3B 0%, #0D9488 55%, #10B981 100%)",
     buttonText: "Book Tickets",
     linkToEventId: 2
   },
